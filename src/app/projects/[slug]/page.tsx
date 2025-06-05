@@ -33,9 +33,17 @@ const mdComponents = {
 };
 
 async function getProject(slug: string) {
+  const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
+  
+  // If no API URL is configured, return null
+  if (!apiUrl) {
+    console.warn('NEXT_PUBLIC_STRAPI_API_URL is not configured');
+    return null;
+  }
+
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/projects?filters[slug][$eq]=${slug}&populate=*`,
+      `${apiUrl}/api/projects?filters[slug][$eq]=${slug}&populate=*`,
       { next: { revalidate: 60 } }
     );
 

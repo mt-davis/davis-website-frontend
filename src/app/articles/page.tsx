@@ -4,17 +4,31 @@ import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 
 async function getArticles() {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_STRAPI_API_URL}/api/articles?populate=*`,
-    { next: { revalidate: 60 } }
-  );
+  const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
   
-  if (!res.ok) {
-    throw new Error('Failed to fetch articles');
+  // If no API URL is configured, return empty array
+  if (!apiUrl) {
+    console.warn('NEXT_PUBLIC_STRAPI_API_URL is not configured');
+    return [];
   }
 
-  const data = await res.json();
-  return data.data || [];
+  try {
+    const res = await fetch(
+      `${apiUrl}/api/articles?populate=*`,
+      { next: { revalidate: 60 } }
+    );
+    
+    if (!res.ok) {
+      console.error('Failed to fetch articles:', res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    return data.data || [];
+  } catch (error) {
+    console.error('Error fetching articles:', error);
+    return [];
+  }
 }
 
 function EmptyArticlesState() {
