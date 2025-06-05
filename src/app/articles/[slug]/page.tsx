@@ -33,6 +33,14 @@ const mdComponents = {
   ),
 };
 
+// Update the type definition
+interface PageProps {
+  params: {
+    slug: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
 async function getArticle(slug: string) {
   try {
     const res = await fetch(
@@ -116,7 +124,10 @@ function UnderConstructionPage({ title }: { title: string }) {
   );
 }
 
-export default async function ArticleDetail({ params }: { params: { slug: string } }) {
+export default async function ArticleDetail({
+  params,
+  searchParams,
+}: PageProps) {
   const article = await getArticle(params.slug);
 
   if (!article) {
