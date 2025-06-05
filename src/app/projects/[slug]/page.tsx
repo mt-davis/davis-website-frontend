@@ -32,11 +32,6 @@ const mdComponents = {
   ),
 };
 
-type Props = {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
 async function getProject(slug: string) {
   try {
     const res = await fetch(
@@ -57,8 +52,11 @@ async function getProject(slug: string) {
   }
 }
 
-export default async function ProjectDetail(props: Props) {
-  const { params } = props;
+export default async function ProjectDetail({
+  params,
+}: {
+  params: { slug: string }
+}) {
   const project = await getProject(params.slug);
 
   if (!project) {

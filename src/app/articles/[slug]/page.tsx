@@ -33,11 +33,6 @@ const mdComponents = {
   ),
 };
 
-type Props = {
-  params: { slug: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
 async function getArticle(slug: string) {
   try {
     const res = await fetch(
@@ -121,8 +116,11 @@ function UnderConstructionPage({ title }: { title: string }) {
   );
 }
 
-export default async function ArticleDetail(props: Props) {
-  const { params } = props;
+export default async function ArticleDetail({
+  params,
+}: {
+  params: { slug: string }
+}) {
   const article = await getArticle(params.slug);
 
   if (!article) {
