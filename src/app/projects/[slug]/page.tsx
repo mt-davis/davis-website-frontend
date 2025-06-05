@@ -32,11 +32,9 @@ const mdComponents = {
   ),
 };
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+type Props = {
+  params: { slug: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 async function getProject(slug: string) {
@@ -59,10 +57,8 @@ async function getProject(slug: string) {
   }
 }
 
-export default async function ProjectDetail({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function ProjectDetail(props: Props) {
+  const { params } = props;
   const project = await getProject(params.slug);
 
   if (!project) {
