@@ -119,9 +119,10 @@ function UnderConstructionPage({ title }: { title: string }) {
 export default async function ArticleDetail({
   params,
 }: {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }) {
-  const article = await getArticle(params.slug);
+  const { slug } = await params;
+  const article = await getArticle(slug);
 
   if (!article) {
     return notFound();
