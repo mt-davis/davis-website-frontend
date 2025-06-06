@@ -4,6 +4,7 @@ import { Great_Vibes } from 'next/font/google';
 import { Montserrat } from 'next/font/google';
 import "./globals.css";
 import { defaultMetadata } from '@/lib/metadata';
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
