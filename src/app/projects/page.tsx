@@ -63,12 +63,12 @@ export default async function ProjectsPage() {
   return (
     <>
       <ArticleHeader />
-      <main className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 pt-24 pb-16 px-4">
+      <main className="min-h-screen bg-white pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Projects & Work</h1>
-            <div className="w-24 h-1 bg-pink-500 mx-auto"></div>
+            <div className="w-24 h-1 bg-blue-500 mx-auto"></div>
           </div>
 
           {projects.length === 0 ? (
