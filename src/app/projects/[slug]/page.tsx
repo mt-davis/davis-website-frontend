@@ -7,6 +7,8 @@ import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import UnderConstructionPage from '@/components/UnderConstructionPage';
 import ShareButtons from '@/components/ShareButtons';
+import { calculateReadingTime, formatReadingTime } from '@/utils/readingTime';
+import { FiClock } from 'react-icons/fi';
 import type { Metadata } from 'next';
 import { defaultMetadata } from '@/lib/metadata';
 
@@ -192,6 +194,13 @@ export default async function ProjectDetail({
                     })}
                   </time>
                 )}
+                <div className="flex items-center">
+                  <FiClock className="mr-2" />
+                  {formatReadingTime(calculateReadingTime(
+                    (description || '') + 
+                    (block?.map((b: { body?: string }) => b.body || '').join(' ') || '')
+                  ))}
+                </div>
                 {project.author && (
                   <div className="flex items-center">
                     <span className="mr-2">👤</span>
