@@ -85,7 +85,7 @@ export default async function ProjectsPage() {
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Projects & Work</h1>
+            <h1 className="text-4xl font-bold mb-4 text-black">Projects & Work</h1>
             <div className="w-24 h-1 bg-blue-500 mx-auto"></div>
           </div>
 
