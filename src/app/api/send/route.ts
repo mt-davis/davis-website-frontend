@@ -17,12 +17,17 @@ const emailSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log('Received request body:', body);
 
     // Validate request body
     const result = emailSchema.safeParse(body);
     if (!result.success) {
+      console.error('Validation errors:', result.error.errors);
       return NextResponse.json(
-        { error: 'Invalid request data' },
+        { 
+          error: 'Invalid request data',
+          details: result.error.errors
+        },
         { status: 400 }
       );
     }
@@ -46,8 +51,9 @@ export async function POST(request: Request) {
 
       const verificationData = await verificationResponse.json();
       if (!verificationData.success) {
+        console.error('hCaptcha verification failed:', verificationData);
         return NextResponse.json(
-          { error: 'Invalid captcha' },
+          { error: 'Invalid captcha', details: verificationData },
           { status: 400 }
         );
       }
@@ -63,8 +69,9 @@ export async function POST(request: Request) {
     });
 
     if (error) {
+      console.error('Resend error:', error);
       return NextResponse.json(
-        { error: 'Failed to send email' },
+        { error: 'Failed to send email', details: error },
         { status: 500 }
       );
     }
@@ -73,7 +80,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

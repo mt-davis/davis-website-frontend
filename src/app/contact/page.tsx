@@ -40,10 +40,19 @@ export default function ContactPage() {
     try {
       let token;
       try {
-        token = await captchaRef.current?.execute();
+        // For visible captcha, get the response directly
+        token = captchaRef.current?.getResponse();
+        
         if (!token) {
-          throw new Error('Failed to get hCaptcha token');
+          // If no token, try to execute (for invisible mode compatibility)
+          token = await captchaRef.current?.execute();
         }
+        
+        if (!token) {
+          throw new Error('Please complete the captcha verification');
+        }
+        
+        console.log('Using captcha token:', token);
       } catch (captchaError) {
         console.error('hCaptcha error:', captchaError);
         setStatus('error');
@@ -51,16 +60,33 @@ export default function ContactPage() {
         return;
       }
       
+      const formPayload = { ...formData, hcaptchaToken: token };
+      console.log('Sending form data:', formPayload);
+      
       const response = await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, hcaptchaToken: token }),
+        body: JSON.stringify(formPayload),
       });
 
       const data = await response.json();
+      console.log('API response:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        let errorMessage = data.error || 'Failed to send message';
+        if (data.details) {
+          console.error('Full error details:', JSON.stringify(data.details, null, 2));
+          if (Array.isArray(data.details)) {
+            errorMessage = data.details
+              .map((err: any) => `${err.path.join('.')}: ${err.message}`)
+              .join('\n');
+          } else if (typeof data.details === 'string') {
+            errorMessage = data.details;
+          } else {
+            errorMessage = JSON.stringify(data.details, null, 2);
+          }
+        }
+        throw new Error(errorMessage);
       }
 
       setStatus('success');
@@ -166,24 +192,32 @@ export default function ContactPage() {
 
               {/* HCaptcha */}
               <div className="flex justify-center">
-                <HCaptcha
-                  ref={captchaRef}
-                  sitekey={siteKey}
-                  size="invisible"
-                  onError={(err) => {
-                    console.error('hCaptcha error:', err);
-                    setStatus('error');
-                    setErrorMessage('Failed to load captcha. Please check your internet connection.');
-                  }}
-                  onLoad={() => {
-                    console.log('hCaptcha loaded successfully');
-                  }}
-                />
+                <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
+                  <HCaptcha
+                    ref={captchaRef}
+                    sitekey={siteKey}
+                    size="normal"
+                    onError={(err) => {
+                      console.error('hCaptcha error:', err);
+                      setStatus('error');
+                      setErrorMessage('Failed to load captcha. Please check your internet connection.');
+                    }}
+                    onLoad={() => {
+                      console.log('hCaptcha loaded successfully with site key:', siteKey);
+                    }}
+                    onVerify={(token) => {
+                      console.log('hCaptcha verified with token:', token);
+                    }}
+                    onExpire={() => {
+                      console.log('hCaptcha expired');
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Status Messages */}
               {status === 'error' && (
-                <div className="text-red-600 text-center p-3 bg-red-50 rounded-lg">
+                <div className="text-red-600 text-center p-3 bg-red-50 rounded-lg whitespace-pre-wrap">
                   {errorMessage}
                 </div>
               )}
