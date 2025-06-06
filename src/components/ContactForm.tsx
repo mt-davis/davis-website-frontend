@@ -2,17 +2,17 @@
 
 import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import type { HCaptchaComponent } from '@hcaptcha/react-hcaptcha';
+import type { ComponentType } from 'react';
 
-// Dynamically import HCaptcha with no SSR
-const HCaptcha = dynamic(() => import('@hcaptcha/react-hcaptcha'), {
+// Import the type without using the default import
+const HCaptcha = dynamic<any>(() => import('@hcaptcha/react-hcaptcha'), {
   ssr: false,
   loading: () => (
     <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
       <div className="animate-pulse">Loading captcha...</div>
     </div>
   ),
-}) as typeof HCaptchaComponent;
+});
 
 interface ContactFormProps {
   onClose: () => void;
@@ -27,7 +27,7 @@ export default function ContactForm({ onClose }: ContactFormProps) {
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const captchaRef = useRef<HCaptchaComponent>(null);
+  const captchaRef = useRef<any>(null);
   const [siteKey, setSiteKey] = useState<string>('');
 
   useEffect(() => {
@@ -174,7 +174,7 @@ export default function ContactForm({ onClose }: ContactFormProps) {
             <HCaptcha
               sitekey={siteKey}
               size="normal"
-              onError={(err) => {
+              onError={(err: string) => {
                 console.error('hCaptcha error:', err);
                 setStatus('error');
                 setErrorMessage('Failed to load captcha. Please check your internet connection.');
@@ -182,7 +182,7 @@ export default function ContactForm({ onClose }: ContactFormProps) {
               onLoad={() => {
                 console.log('hCaptcha loaded successfully with site key:', siteKey);
               }}
-              onVerify={(token) => {
+              onVerify={(token: string) => {
                 console.log('hCaptcha verified with token:', token);
               }}
               onExpire={() => {
