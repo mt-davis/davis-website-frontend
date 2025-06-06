@@ -3,6 +3,24 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
+import type { Metadata } from 'next';
+import { defaultMetadata } from '@/lib/metadata';
+
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  title: "Projects & Work | Marquese T Davis",
+  description: "Explore my portfolio of projects in IT Leadership, Digital Transformation, and Technology Innovation.",
+  openGraph: {
+    ...defaultMetadata.openGraph,
+    title: "Projects & Work | Marquese T Davis",
+    description: "Explore my portfolio of projects in IT Leadership, Digital Transformation, and Technology Innovation.",
+  },
+  twitter: {
+    ...defaultMetadata.twitter,
+    title: "Projects & Work | Marquese T Davis",
+    description: "Explore my portfolio of projects in IT Leadership, Digital Transformation, and Technology Innovation.",
+  }
+};
 
 async function getProjects() {
   const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
