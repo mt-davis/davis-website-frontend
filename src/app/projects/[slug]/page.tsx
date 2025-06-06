@@ -10,11 +10,11 @@ import ShareButtons from '@/components/ShareButtons';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
-  h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-8 mb-4" {...props} />,
-  h2: ({ node, ...props }: any) => <h2 className="text-3xl font-semibold mt-6 mb-3" {...props} />,
-  h3: ({ node, ...props }: any) => <h3 className="text-2xl font-semibold mt-5 mb-3" {...props} />,
-  h4: ({ node, ...props }: any) => <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />,
-  h5: ({ node, ...props }: any) => <h5 className="text-lg font-semibold mt-3 mb-2" {...props} />,
+  h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-8 mb-4 text-black" {...props} />,
+  h2: ({ node, ...props }: any) => <h2 className="text-3xl font-semibold mt-6 mb-3 text-black" {...props} />,
+  h3: ({ node, ...props }: any) => <h3 className="text-2xl font-semibold mt-5 mb-3 text-black" {...props} />,
+  h4: ({ node, ...props }: any) => <h4 className="text-xl font-semibold mt-4 mb-2 text-black" {...props} />,
+  h5: ({ node, ...props }: any) => <h5 className="text-lg font-semibold mt-3 mb-2 text-black" {...props} />,
   p:  ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
   ul: ({ node, ...props }: any) => <ul className="list-disc pl-6 mb-4 space-y-2 text-gray-700" {...props} />,
   ol: ({ node, ...props }: any) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-gray-700" {...props} />,
