@@ -97,7 +97,7 @@ export default async function ProjectDetail({
         <div className="relative w-full h-[60vh] min-h-[500px]">
           {coverUrl ? (
             <Image
-              src={`${process.env.NEXT_PUBLIC_STRAPI_API_URL}${coverUrl}`}
+              src={coverUrl.startsWith('/') ? `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${coverUrl}` : coverUrl}
               alt={title || 'Project cover image'}
               fill
               className="object-cover"
