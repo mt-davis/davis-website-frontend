@@ -86,9 +86,13 @@ export default function TabsSection() {
                   </div>
                   <div className="space-y-4">
                     {tab.content.map((paragraph, index) => (
-                      <p key={index} className="text-gray-600 leading-relaxed">
-                        {paragraph}
-                      </p>
+                      typeof paragraph === 'string' ? (
+                        <p key={index} className="text-gray-600 leading-relaxed">
+                          {paragraph}
+                        </p>
+                      ) : (
+                        <div key={index} className="w-full h-px bg-gray-200 my-4"></div>
+                      )
                     ))}
                   </div>
                 </div>

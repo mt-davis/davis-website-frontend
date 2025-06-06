@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import UnderConstructionPage from '@/components/UnderConstructionPage';
+import ShareButtons from '@/components/ShareButtons';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
@@ -92,13 +93,13 @@ export default async function ProjectDetail({
   return (
     <>
       <ArticleHeader />
-      <article className="min-h-screen bg-white pt-20">
-        {/* Hero Section with Cover Image */}
+      <article className="min-h-screen bg-white pt-20 relative">
+        <ShareButtons url="" title={title} description={description} />
         <div className="relative w-full h-[60vh] min-h-[500px]">
           {coverUrl ? (
             <Image
-              src={coverUrl.startsWith('/') ? `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${coverUrl}` : coverUrl}
-              alt={title || 'Project cover image'}
+              src={coverUrl}
+              alt={title}
               fill
               className="object-cover"
               priority
