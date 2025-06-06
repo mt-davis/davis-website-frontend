@@ -135,10 +135,10 @@ export default async function ProjectDetail({
 
               {/* Metadata */}
               <div className="flex flex-wrap items-center justify-center gap-6 text-white/90 text-sm">
-                {project.attributes?.date && (
-                  <time dateTime={project.attributes.date} className="flex items-center">
+                {project.publishedAt && (
+                  <time dateTime={project.publishedAt} className="flex items-center">
                     <span className="mr-2">📅</span>
-                    {new Date(project.attributes.date).toLocaleDateString('en-US', {
+                    {new Date(project.publishedAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'

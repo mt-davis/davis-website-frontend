@@ -131,8 +131,8 @@ export default async function ProjectsPage() {
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-500">
-                            {project.attributes?.date 
-                              ? new Date(project.attributes.date).toLocaleDateString()
+                            {project.publishedAt 
+                              ? new Date(project.publishedAt).toLocaleDateString()
                               : 'Date not available'}
                           </span>
                           <span className="text-pink-500 text-sm font-medium">View Project →</span>
