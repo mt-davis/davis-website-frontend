@@ -42,6 +42,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${montserrat.variable} antialiased`}
       >
         {children}
+        <Analytics/>
       </body>
     </html>
   );
