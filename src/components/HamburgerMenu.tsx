@@ -41,9 +41,6 @@ export default function HamburgerMenu({ variant = 'light' }: HamburgerMenuProps)
           <Link href="/articles" className="block px-4 py-2 text-gray-800 hover:bg-gray-100/80 transition-colors">
             Articles
           </Link>
-          <Link href="/contact" className="block px-4 py-2 text-gray-800 hover:bg-gray-100/80 transition-colors">
-            Contact
-          </Link>
         </div>
       )}
     </div>

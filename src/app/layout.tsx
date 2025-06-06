@@ -6,6 +6,7 @@ import "./globals.css";
 import { defaultMetadata } from '@/lib/metadata';
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import ContactBubble from '@/components/ContactBubble';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
         {children}
         <Analytics/>
         <SpeedInsights />
+        <ContactBubble />
       </body>
     </html>
   );
