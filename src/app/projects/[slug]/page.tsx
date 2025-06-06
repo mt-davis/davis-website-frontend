@@ -7,24 +7,65 @@ import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import UnderConstructionPage from '@/components/UnderConstructionPage';
 import ShareButtons from '@/components/ShareButtons';
+import SafeEmail from '@/components/SafeEmail';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
-  h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-8 mb-4" {...props} />,
-  h2: ({ node, ...props }: any) => <h2 className="text-3xl font-semibold mt-6 mb-3" {...props} />,
-  h3: ({ node, ...props }: any) => <h3 className="text-2xl font-semibold mt-5 mb-3" {...props} />,
-  h4: ({ node, ...props }: any) => <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />,
-  h5: ({ node, ...props }: any) => <h5 className="text-lg font-semibold mt-3 mb-2" {...props} />,
-  p:  ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
+  h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-8 mb-4 text-black" {...props} />,
+  h2: ({ node, ...props }: any) => <h2 className="text-3xl font-semibold mt-6 mb-3 text-black" {...props} />,
+  h3: ({ node, ...props }: any) => <h3 className="text-2xl font-semibold mt-5 mb-3 text-black" {...props} />,
+  h4: ({ node, ...props }: any) => <h4 className="text-xl font-semibold mt-4 mb-2 text-black" {...props} />,
+  h5: ({ node, ...props }: any) => <h5 className="text-lg font-semibold mt-3 mb-2 text-black" {...props} />,
+  p:  ({ node, children, ...props }: any) => {
+    // Check if the paragraph contains an email address
+    const emailRegex = /([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/g;
+    if (typeof children === 'string' && emailRegex.test(children)) {
+      const parts = children.split('@');
+      return (
+        <p className="mb-4 leading-relaxed text-gray-700">
+          <SafeEmail emailUser={parts[0]} emailDomain={parts[1]} />
+        </p>
+      );
+    }
+    return <p className="mb-4 leading-relaxed text-gray-700" {...props}>{children}</p>;
+  },
   ul: ({ node, ...props }: any) => <ul className="list-disc pl-6 mb-4 space-y-2 text-gray-700" {...props} />,
   ol: ({ node, ...props }: any) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-gray-700" {...props} />,
-  li: ({ node, ...props }: any) => <li className="mb-2" {...props} />,
+  li: ({ node, children, ...props }: any) => {
+    // Check if the list item contains an email address
+    const emailRegex = /([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/g;
+    if (typeof children === 'string' && emailRegex.test(children)) {
+      const parts = children.split('@');
+      return (
+        <li className="mb-2">
+          <SafeEmail emailUser={parts[0]} emailDomain={parts[1]} />
+        </li>
+      );
+    }
+    return <li className="mb-2" {...props}>{children}</li>;
+  },
   blockquote: ({ node, ...props }: any) => (
     <blockquote className="border-l-4 border-pink-500 pl-4 italic text-gray-600 mb-6 py-2 bg-gray-50" {...props} />
   ),
-  a: ({ node, ...props }: any) => (
-    <a className="text-pink-500 hover:text-pink-600 underline transition-colors" {...props} />
-  ),
+  a: ({ node, href, children, ...props }: any) => {
+    // Check if this is a mailto: link or contains an email
+    const emailRegex = /([a-zA-Z0-9._-]+)@([a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/g;
+    const mailtoRegex = /^mailto:(.+@.+\..+)$/i;
+    
+    if (href && mailtoRegex.test(href)) {
+      // Extract email from mailto: link
+      const email = href.replace('mailto:', '');
+      const [user, domain] = email.split('@');
+      return <SafeEmail emailUser={user} emailDomain={domain} className="text-pink-500 hover:text-pink-600" />;
+    } else if (typeof children === 'string' && emailRegex.test(children)) {
+      // Handle plain email text in link
+      const [user, domain] = children.split('@');
+      return <SafeEmail emailUser={user} emailDomain={domain} className="text-pink-500 hover:text-pink-600" />;
+    }
+    
+    // Regular link handling
+    return <a className="text-pink-500 hover:text-pink-600 underline transition-colors" {...props}>{children}</a>;
+  },
   code: ({ node, ...props }: any) => (
     <code className="bg-gray-100 rounded px-1 py-0.5 text-sm font-mono" {...props} />
   ),
