@@ -6,6 +6,9 @@ import { notFound } from "next/navigation";
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import UnderConstructionPage from '@/components/UnderConstructionPage';
+import ShareButtons from '@/components/ShareButtons';
+import type { Metadata } from 'next';
+import { defaultMetadata } from '@/lib/metadata';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
@@ -31,6 +34,50 @@ const mdComponents = {
     <pre className="bg-gray-100 rounded-lg p-4 overflow-x-auto mb-4" {...props} />
   ),
 };
+
+interface PageProps {
+  params: {
+    slug: string;
+  };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const project = await getProject(params.slug);
+
+  if (!project) {
+    return defaultMetadata;
+  }
+
+  const { title, description } = project;
+  const coverUrl = project.cover?.formats?.medium?.url || project.cover?.formats?.small?.url || project.cover?.url;
+  const imageUrl = coverUrl ? `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${coverUrl}` : '/images/og-image.png';
+
+  return {
+    ...defaultMetadata,
+    title: `${title} | Projects`,
+    description: description || `Explore details about ${title} - A project by Marquese T Davis`,
+    openGraph: {
+      ...defaultMetadata.openGraph,
+      title: `${title} | Projects`,
+      description: description || `Explore details about ${title} - A project by Marquese T Davis`,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: title
+        }
+      ]
+    },
+    twitter: {
+      ...defaultMetadata.twitter,
+      title: `${title} | Projects`,
+      description: description || `Explore details about ${title} - A project by Marquese T Davis`,
+      images: [imageUrl]
+    }
+  };
+}
 
 async function getProject(slug: string) {
   const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
@@ -162,21 +209,31 @@ export default async function ProjectDetail({
         </div>
 
         <div className="max-w-4xl mx-auto px-4 py-12">
-          {/* Project Link */}
-          {project.link && (
-            <div className="mb-8 text-center">
-              <a 
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors shadow-lg group"
-              >
-                <span className="mr-2">🔗</span>
-                View Project
-                <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-              </a>
-            </div>
-          )}
+          {/* Project Link and Share Buttons Container */}
+          <div className="mb-12 flex justify-between items-start">
+            {/* Project Link */}
+            {project.link ? (
+              <div>
+                <a 
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors shadow-lg group"
+                >
+                  <span className="mr-2">🔗</span>
+                  View Project
+                  <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                </a>
+              </div>
+            ) : <div />}
+
+            {/* Share Buttons */}
+            <ShareButtons
+              url={`${process.env.NEXT_PUBLIC_SITE_URL || ''}/projects/${slug}`}
+              title={title}
+              description={description || `Check out this project: ${title}`}
+            />
+          </div>
 
           {/* Technologies */}
           {project.technologies && project.technologies.length > 0 && (
