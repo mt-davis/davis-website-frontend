@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 
 // Define test key constant
@@ -17,7 +17,17 @@ export default function ContactBubble() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const captchaRef = useRef<HCaptcha>(null);
-  const [siteKey, setSiteKey] = useState(TEST_SITE_KEY);
+  const [siteKey, setSiteKey] = useState<string>('');
+
+  useEffect(() => {
+    // Get the site key from environment variables
+    const envSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
+    if (!envSiteKey) {
+      console.error('NEXT_PUBLIC_HCAPTCHA_SITE_KEY is not configured');
+      return;
+    }
+    setSiteKey(envSiteKey);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
