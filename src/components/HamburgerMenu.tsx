@@ -81,15 +81,23 @@ export default function HamburgerMenu({ variant = 'light' }: HamburgerMenuProps)
         md:translate-x-0 md:top-full md:left-0 md:mt-2
         ${!isOpen && 'md:hidden'}
       `}>
-        {/* Mobile Menu Header */}
-        <div className="flex flex-col px-6 mb-8 border-b border-gray-100 pb-6 md:hidden">
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
-              Navigation
-            </span>
+        {/* Menu Header - Both Mobile and Desktop */}
+        <div className="flex flex-col px-6 mb-8 border-b border-gray-100 pb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <h2 className="text-xl font-bold flex items-center">
+                <span className="bg-gray-100 px-2.5 py-1.5 rounded-lg mr-2 text-gray-800 font-black tracking-tighter">
+                  MD
+                </span>
+                <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                  Navigation
+                </span>
+              </h2>
+            </div>
+            {/* Close button - Mobile only */}
             <button
               onClick={() => setIsOpen(false)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-all duration-300 hover:rotate-90"
+              className="p-2 hover:bg-gray-100 rounded-full transition-all duration-300 hover:rotate-90 md:hidden"
               aria-label="Close menu"
             >
               <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +105,7 @@ export default function HamburgerMenu({ variant = 'light' }: HamburgerMenuProps)
               </svg>
             </button>
           </div>
-          <p className="text-sm text-gray-500">Explore the different sections of the website</p>
+          <p className="text-sm text-gray-500 mt-4 md:hidden">Explore the different sections of the website</p>
         </div>
         
         <nav className="space-y-2.5 px-4">
