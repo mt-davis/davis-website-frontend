@@ -78,7 +78,7 @@ function EmptyArticlesState() {
         The Library is Empty!
       </h1>
       <p className="text-xl text-gray-600 mb-8 max-w-2xl animate-fade-in-delay">
-        Our writers are busy crafting amazing articles fueled by coffee and inspiration.
+        I'm busy crafting amazing articles fueled by coffee and inspiration.
         Check back soon for brilliant insights! ✨
       </p>
 
@@ -118,7 +118,7 @@ export default async function ArticlesPage() {
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Articles & Insights</h1>
+            <h1 className="text-4xl font-bold mb-4 text-black">Articles & Insights</h1>
             <div className="w-24 h-1 bg-pink-500 mx-auto"></div>
           </div>
 
