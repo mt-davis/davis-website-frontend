@@ -78,13 +78,31 @@ export default function Header() {
       <section className="relative h-[100svh]">
         {/* Background Image with blur and tint */}
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <Image
-            src="/images/hero-image.png"
-            alt="New Haven, CT Ai"
-            fill
-            className="object-cover blur-[0px]"
-            priority
-          />
+          {/* Mobile Hero Image */}
+          <div className="block md:hidden h-full">
+            <Image
+              src="/images/mobile-hero.png"
+              alt="New Haven, CT Ai Mobile"
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+            {/* Mobile overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-800/30 to-gray-900/30" />
+          </div>
+
+          {/* Desktop Hero Image */}
+          <div className="hidden md:block h-full">
+            <Image
+              src="/images/hero-image.png"
+              alt="New Haven, CT Ai"
+              fill
+              className="object-cover"
+              priority
+              sizes="100vw"
+            />
+          </div>
           {/* Gray tint overlay for better text readability */}
           <div className="absolute inset-0 bg-gradient-to-b from-gray-800/30 to-gray-900/30" />
         </div>
