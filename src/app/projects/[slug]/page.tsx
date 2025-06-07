@@ -8,6 +8,7 @@ import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import UnderConstructionPage from '@/components/UnderConstructionPage';
 import ShareButtons from '@/components/ShareButtons';
+import Obfuscate from 'react-obfuscate';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {

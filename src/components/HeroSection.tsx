@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { FaConnectdevelop } from "react-icons/fa6";
 
 export default function HeroSection() {
   return (
@@ -7,9 +8,13 @@ export default function HeroSection() {
         {/* Left column: pathways list */}
         <div className="w-48 flex-shrink-0">
           <p className="text-lg font-bold mb-2">Pathways For:</p>
-          <h4 className="text-base font-medium">STRATEGY & INSIGHTS</h4>
-          <h4 className="text-base font-medium">INNOVATION</h4>
-          <h4 className="text-base font-medium">LEADERSHIP</h4>
+          <div className="flex flex-row items-start gap-8">
+            <div>
+              <h4 className="text-base font-medium">STRATEGY & INSIGHTS</h4>
+              <h4 className="text-base font-medium">INNOVATION</h4>
+              <h4 className="text-base font-medium">LEADERSHIP</h4>
+            </div>
+          </div>
         </div>
 
         {/* Center column: description */}
