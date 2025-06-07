@@ -139,7 +139,7 @@ export default function ContactBubble() {
 
             {/* Modal Header */}
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-2">Get in Touch</h2>
+              <h2 className="text-2xl font-bold mb-2 text-black">Get in Touch</h2>
               <p className="text-gray-600">
                 Have a question or want to collaborate? I'd love to hear from you.
               </p>
