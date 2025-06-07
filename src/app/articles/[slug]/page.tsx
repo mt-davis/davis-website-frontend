@@ -3,6 +3,7 @@ import Image from "next/image";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import remarkFlexibleMarkers from 'remark-flexible-markers';
 import { notFound } from "next/navigation";
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
@@ -222,10 +223,33 @@ export default async function ArticleDetail({
 
         <div className="max-w-4xl mx-auto px-4 py-12">
           {/* Content */}
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-pink-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:text-pink-500 prose-code:bg-pink-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100">
             {description && (
               <div className="mb-8">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdComponents}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkFlexibleMarkers]}
+                  rehypePlugins={[rehypeRaw]}
+                  components={{
+                    ...mdComponents,
+                    // Override specific components for better markdown support
+                    code: ({ node, inline, className, children, ...props }: any) => {
+                      const match = /language-(\w+)/.exec(className || '');
+                      const language = match ? match[1] : '';
+                      
+                      return inline ? (
+                        <code className="bg-pink-50 text-pink-500 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+                          {children}
+                        </code>
+                      ) : (
+                        <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto">
+                          <code className={`language-${language}`} {...props}>
+                            {children}
+                          </code>
+                        </pre>
+                      );
+                    }
+                  }}
+                >
                   {description}
                 </ReactMarkdown>
               </div>
@@ -235,7 +259,30 @@ export default async function ArticleDetail({
                 case "shared.rich-text":
                   return (
                     <div key={`${block.__component}-${block.id}-${idx}`} className="mb-8">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdComponents}>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkFlexibleMarkers]}
+                        rehypePlugins={[rehypeRaw]}
+                        components={{
+                          ...mdComponents,
+                          // Override specific components for better markdown support
+                          code: ({ node, inline, className, children, ...props }: any) => {
+                            const match = /language-(\w+)/.exec(className || '');
+                            const language = match ? match[1] : '';
+                            
+                            return inline ? (
+                              <code className="bg-pink-50 text-pink-500 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+                                {children}
+                              </code>
+                            ) : (
+                              <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto">
+                                <code className={`language-${language}`} {...props}>
+                                  {children}
+                                </code>
+                              </pre>
+                            );
+                          }
+                        }}
+                      >
                         {block.body}
                       </ReactMarkdown>
                     </div>
