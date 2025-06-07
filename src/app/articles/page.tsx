@@ -155,6 +155,17 @@ export default async function ArticlesPage() {
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
                           unoptimized
                         />
+                        {/* Gradient overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/65 to-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        {/* Additional center overlay for better text readability */}
+                        <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        
+                        {/* Hover Content */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <p className="text-white text-sm px-4 text-center">
+                            {article.description || 'Read more about this article'}
+                          </p>
+                        </div>
                       </div>
 
                       {/* Article Content */}
@@ -162,9 +173,6 @@ export default async function ArticlesPage() {
                         <h2 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-pink-500 transition-colors">
                           {article.title || 'Untitled Article'}
                         </h2>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {article.description || 'No description available'}
-                        </p>
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-500">
                             {article.publishedAt 

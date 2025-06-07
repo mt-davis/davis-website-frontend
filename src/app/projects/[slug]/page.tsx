@@ -109,7 +109,10 @@ export default async function ProjectDetail({
           )}
           
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/65 to-black/50" />
+
+          {/* Additional center overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
 
           {/* Content overlay */}
           <div className="absolute inset-0">
@@ -130,9 +133,16 @@ export default async function ProjectDetail({
             {/* Centered content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
               {/* Title */}
-              <h1 className="text-4xl md:text-6xl font-bold text-center text-white mb-6 max-w-4xl">
+              <h1 className="text-4xl md:text-6xl font-bold text-center text-white mb-4 max-w-4xl">
                 {title}
               </h1>
+
+              {/* Description */}
+              {description && (
+                <p className="text-lg md:text-xl text-white/90 text-center mb-6 max-w-3xl">
+                  {description}
+                </p>
+              )}
 
               {/* Metadata */}
               <div className="flex flex-wrap items-center justify-center gap-6 text-white/90 text-sm">
@@ -198,13 +208,6 @@ export default async function ProjectDetail({
           
           {/* Content */}
           <div className="prose prose-lg max-w-none">
-            {description && (
-              <div className="mb-8">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdComponents}>
-                  {description}
-                </ReactMarkdown>
-              </div>
-            )}
             {block?.map((contentBlock: any, idx: number) => {
               switch (contentBlock.__component) {
                 case "shared.rich-text":
