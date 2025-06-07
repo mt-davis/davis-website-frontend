@@ -91,7 +91,7 @@ export default function ContactBubble() {
       {/* Floating Contact Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 w-16 h-16 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center z-50"
+        className="fixed bottom-[calc(2rem+env(safe-area-inset-bottom))] right-[calc(2rem+env(safe-area-inset-right))] w-14 h-14 md:w-16 md:h-16 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-colors duration-200 flex items-center justify-center z-50 touch-manipulation"
         aria-label="Contact Us"
       >
         <svg
@@ -100,7 +100,7 @@ export default function ContactBubble() {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-8 h-8"
+          className="w-7 h-7 md:w-8 md:h-8"
         >
           <path
             strokeLinecap="round"
@@ -112,171 +112,173 @@ export default function ContactBubble() {
 
       {/* Modal Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           {/* Modal Content */}
-          <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              aria-label="Close"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-lg mx-auto max-h-[90vh] overflow-y-auto relative">
+            <div className="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-200 relative">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Close"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* Modal Header */}
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-black">Get in Touch</h2>
-              <p className="text-gray-600">
-                Have a question or want to collaborate? I'd love to hear from you.
-              </p>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <div className="flex justify-center items-center">
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-black">Get in Touch</h2>
+                  <p className="text-gray-600 mt-2">
+                    Have a question or want to collaborate? I'd love to hear from you.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* Contact Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name Field */}
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Your name"
-                />
-              </div>
-
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              {/* Subject Field */}
-              <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  id="subject"
-                  name="subject"
-                  required
-                  value={formData.subject}
-                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="What's this about?"
-                />
-              </div>
-
-              {/* Message Field */}
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  placeholder="Your message here..."
-                />
-              </div>
-
-              {/* HCaptcha */}
-              <div className="flex justify-center">
-                <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
-                  <HCaptcha
-                    ref={captchaRef}
-                    sitekey={siteKey}
-                    size="normal"
-                    onError={(err) => {
-                      console.error('hCaptcha error:', err);
-                      setStatus('error');
-                      setErrorMessage('Failed to load captcha. Please check your internet connection.');
-                    }}
-                    onLoad={() => {
-                      console.log('hCaptcha loaded successfully with site key:', siteKey);
-                    }}
-                    onVerify={(token) => {
-                      console.log('hCaptcha verified with token:', token);
-                    }}
-                    onExpire={() => {
-                      console.log('hCaptcha expired');
-                    }}
+            <div className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Name Field */}
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Your name"
                   />
                 </div>
-              </div>
 
-              {/* Status Messages */}
-              {status === 'error' && (
-                <div className="text-red-600 text-center p-3 bg-red-50 rounded-lg whitespace-pre-wrap">
-                  {errorMessage}
+                {/* Email Field */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="your@email.com"
+                  />
                 </div>
-              )}
-              {status === 'success' && (
-                <div className="text-green-600 text-center p-3 bg-green-50 rounded-lg">
-                  Message sent successfully! I'll get back to you soon.
-                </div>
-              )}
 
-              {/* Submit Button */}
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  disabled={status === 'loading'}
-                  className={`
-                    px-8 py-3 rounded-lg text-white font-semibold
-                    ${status === 'loading'
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'}
-                    transition-colors duration-200
-                    flex items-center space-x-2
-                  `}
-                >
-                  {status === 'loading' ? (
-                    <>
-                      <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                      <span>Sending...</span>
-                    </>
-                  ) : (
-                    'Send Message'
-                  )}
-                </button>
-              </div>
-            </form>
+                {/* Subject Field */}
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                    Subject
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    required
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="What's this about?"
+                  />
+                </div>
+
+                {/* Message Field */}
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    required
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    rows={4}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                    placeholder="Your message here..."
+                  />
+                </div>
+
+                {/* HCaptcha */}
+                <div className="flex justify-center">
+                  <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
+                    <HCaptcha
+                      ref={captchaRef}
+                      sitekey={siteKey}
+                      size="normal"
+                      onError={(err) => {
+                        console.error('hCaptcha error:', err);
+                        setStatus('error');
+                        setErrorMessage('Failed to load captcha. Please check your internet connection.');
+                      }}
+                      onLoad={() => {
+                        console.log('hCaptcha loaded successfully with site key:', siteKey);
+                      }}
+                      onVerify={(token) => {
+                        console.log('hCaptcha verified with token:', token);
+                      }}
+                      onExpire={() => {
+                        console.log('hCaptcha expired');
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Status Messages */}
+                {status === 'error' && (
+                  <div className="text-red-600 text-center p-3 bg-red-50 rounded-lg whitespace-pre-wrap">
+                    {errorMessage}
+                  </div>
+                )}
+                {status === 'success' && (
+                  <div className="text-green-600 text-center p-3 bg-green-50 rounded-lg">
+                    Message sent successfully! I'll get back to you soon.
+                  </div>
+                )}
+
+                {/* Submit Button */}
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={status === 'loading'}
+                    className={`
+                      px-8 py-3 rounded-lg text-white font-semibold
+                      ${status === 'loading'
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'}
+                      transition-colors duration-200
+                      flex items-center space-x-2
+                    `}
+                  >
+                    {status === 'loading' ? (
+                      <>
+                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <span>Sending...</span>
+                      </>
+                    ) : (
+                      'Send Message'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
