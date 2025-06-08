@@ -110,16 +110,16 @@ export default async function ProjectsPage() {
                   <Link
                     key={project.slug}
                     href={`/projects/${project.slug}`}
-                    className="group"
+                    className="group block transform transition-all duration-200 hover:-translate-y-1 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 rounded-lg"
                   >
-                    <article className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+                    <article className="bg-white rounded-lg shadow-lg overflow-hidden">
                       {/* Project Image */}
                       <div className="relative h-48 overflow-hidden">
                         <Image
                           src={coverUrl}
                           alt={project.title || 'Project image'}
                           fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="object-cover transform transition-transform duration-300 group-hover:scale-102"
                           unoptimized
                         />
                         {project.status && (
@@ -131,7 +131,7 @@ export default async function ProjectsPage() {
 
                       {/* Project Content */}
                       <div className="p-6">
-                        <h2 className="text-xl font-bold mb-2 text-gray-900 group-hover:text-pink-500 transition-colors">
+                        <h2 className="text-xl font-bold mb-2 text-gray-900 transition-colors duration-200 group-hover:text-pink-500">
                           {project.title || 'Untitled Project'}
                         </h2>
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
