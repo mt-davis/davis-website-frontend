@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
-import { defaultMetadata } from '@/lib/metadata';
+import { defaultMetadata } from '@/lib/seo';
 
 export const metadata: Metadata = {
   ...defaultMetadata,
@@ -63,7 +63,7 @@ function EmptyProjectsState() {
       </p>
       <Link 
         href="/"
-        className="px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors shadow-lg"
+        className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors shadow-lg"
       >
         Back to Homepage →
       </Link>
@@ -123,7 +123,7 @@ export default async function ProjectsPage() {
                           unoptimized
                         />
                         {project.status && (
-                          <div className="absolute top-4 right-4 px-3 py-1 bg-pink-500 text-white text-sm rounded-full">
+                          <div className="absolute top-4 right-4 px-3 py-1 bg-blue-500 text-white text-sm rounded-full">
                             {project.status}
                           </div>
                         )}
@@ -131,7 +131,7 @@ export default async function ProjectsPage() {
 
                       {/* Project Content */}
                       <div className="p-6">
-                        <h2 className="text-xl font-bold mb-2 text-gray-900 transition-colors duration-200 group-hover:text-pink-500">
+                        <h2 className="text-xl font-bold mb-2 text-gray-900 transition-colors duration-200 group-hover:text-blue-500">
                           {project.title || 'Untitled Project'}
                         </h2>
                         <p className="text-gray-600 text-sm mb-4 line-clamp-2">
@@ -153,7 +153,7 @@ export default async function ProjectsPage() {
                               ? new Date(project.publishedAt).toLocaleDateString()
                               : 'Date not available'}
                           </span>
-                          <span className="text-pink-500 text-sm font-medium">View Project →</span>
+                          <span className="text-blue-500 text-sm font-medium">View Project →</span>
                         </div>
                       </div>
                     </article>

@@ -109,7 +109,7 @@ export default function Header() {
 
         {/* Hero Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4 -mt-32">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 leading-tight">WHERE TECHNOLOGY</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 leading-tight">WHERE TECHNOLOGY IS...</h1>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
             <TypedText />
           </h1>

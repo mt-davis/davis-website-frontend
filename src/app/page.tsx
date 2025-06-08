@@ -8,7 +8,7 @@ import TestImage from '@/components/TestImage';
 import TabsSection from '@/components/TabsSection';
 import QuoteSection from '@/components/QuoteSection';
 import type { Metadata } from 'next';
-import { defaultMetadata } from '@/lib/metadata';
+import { defaultMetadata } from '@/lib/seo';
 // …
 export const metadata: Metadata = {
   ...defaultMetadata,

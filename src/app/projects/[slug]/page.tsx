@@ -2,37 +2,147 @@ import Image from "next/image";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypePrism from 'rehype-prism-plus';
 import remarkFlexibleMarkers from 'remark-flexible-markers';
+import remarkBreaks from 'remark-breaks';
+import remarkEmoji from 'remark-emoji';
 import { notFound } from "next/navigation";
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import UnderConstructionPage from '@/components/UnderConstructionPage';
 import ShareButtons from '@/components/ShareButtons';
 import Obfuscate from 'react-obfuscate';
+import { Metadata } from 'next';
+import { defaultMetadata } from '@/lib/seo';
+import { fetchAPI } from '@/lib/api';
+
+// Define the class mapping type
+type ClassMapping = {
+  'highlight': string;
+  'note': string;
+  'warning': string;
+  'text-black': string;
+  'text-white': string;
+};
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
-  h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-8 mb-4 text-black" {...props} />,
-  h2: ({ node, ...props }: any) => <h2 className="text-3xl font-semibold mt-6 mb-3 text-black" {...props} />,
-  h3: ({ node, ...props }: any) => <h3 className="text-2xl font-semibold mt-5 mb-3 text-black" {...props} />,
-  h4: ({ node, ...props }: any) => <h4 className="text-xl font-semibold mt-4 mb-2 text-black" {...props} />,
-  h5: ({ node, ...props }: any) => <h5 className="text-lg font-semibold mt-3 mb-2 text-black" {...props} />,
-  p:  ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
-  ul: ({ node, ...props }: any) => <ul className="list-disc pl-6 mb-4 space-y-2 text-gray-700" {...props} />,
-  ol: ({ node, ...props }: any) => <ol className="list-decimal pl-6 mb-4 space-y-2 text-gray-700" {...props} />,
+  h1: ({ node, ...props }: any) => <h1 className="text-4xl font-bold mt-8 mb-4" {...props} />,
+  h2: ({ node, ...props }: any) => <h2 className="text-3xl font-semibold mt-6 mb-3" {...props} />,
+  h3: ({ node, ...props }: any) => <h3 className="text-2xl font-semibold mt-5 mb-3" {...props} />,
+  h4: ({ node, ...props }: any) => <h4 className="text-xl font-semibold mt-4 mb-2" {...props} />,
+  h5: ({ node, ...props }: any) => <h5 className="text-lg font-semibold mt-3 mb-2" {...props} />,
+  p: ({ node, ...props }: any) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
+  ul: ({ node, ordered, ...props }: any) => (
+    <ul className="list-disc pl-6 mb-4 space-y-2 text-gray-700" {...props} />
+  ),
+  ol: ({ node, ordered, ...props }: any) => (
+    <ol className="list-decimal pl-6 mb-4 space-y-2 text-gray-700" {...props} />
+  ),
   li: ({ node, ...props }: any) => <li className="mb-2" {...props} />,
   blockquote: ({ node, ...props }: any) => (
     <blockquote className="border-l-4 border-pink-500 pl-4 italic text-gray-600 mb-6 py-2 bg-gray-50" {...props} />
   ),
-  a: ({ node, ...props }: any) => (
-    <a className="text-pink-500 hover:text-pink-600 underline transition-colors" {...props} />
+  a: ({ node, href, ...props }: any) => (
+    <a 
+      href={href}
+      className="text-pink-500 hover:text-pink-600 underline transition-colors" 
+      target={href?.startsWith('http') ? '_blank' : undefined}
+      rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+      {...props} 
+    />
   ),
-  code: ({ node, ...props }: any) => (
-    <code className="bg-gray-100 rounded px-1 py-0.5 text-sm font-mono" {...props} />
-  ),
+  code: ({ node, inline, className, children, ...props }: any) => {
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : '';
+    
+    return inline ? (
+      <code className="bg-gray-100 rounded px-1 py-0.5 text-sm font-mono text-pink-600" {...props}>
+        {children}
+      </code>
+    ) : (
+      <pre className="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4">
+        <code className={`language-${language} text-gray-100`} {...props}>
+          {children}
+        </code>
+      </pre>
+    );
+  },
   pre: ({ node, ...props }: any) => (
-    <pre className="bg-gray-100 rounded-lg p-4 overflow-x-auto mb-4" {...props} />
+    <pre className="bg-gray-900 rounded-lg p-4 overflow-x-auto mb-4 text-gray-100" {...props} />
   ),
+  table: ({ node, ...props }: any) => (
+    <div className="overflow-x-auto mb-6">
+      <table className="min-w-full divide-y divide-gray-200" {...props} />
+    </div>
+  ),
+  thead: ({ node, ...props }: any) => (
+    <thead className="bg-gray-50" {...props} />
+  ),
+  tbody: ({ node, ...props }: any) => (
+    <tbody className="divide-y divide-gray-200 bg-white" {...props} />
+  ),
+  tr: ({ node, ...props }: any) => (
+    <tr className="hover:bg-gray-50 transition-colors" {...props} />
+  ),
+  th: ({ node, ...props }: any) => (
+    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" {...props} />
+  ),
+  td: ({ node, ...props }: any) => (
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500" {...props} />
+  ),
+  img: ({ node, src, alt, ...props }: any) => (
+    <span className="relative block w-full h-auto my-6">
+      <Image
+        src={src || ''}
+        alt={alt || ''}
+        width={800}
+        height={400}
+        className="rounded-lg shadow-lg"
+        {...props}
+      />
+    </span>
+  ),
+  hr: ({ node, ...props }: any) => (
+    <hr className="my-8 border-t-2 border-gray-200" {...props} />
+  ),
+  del: ({ node, ...props }: any) => (
+    <del className="text-gray-500 line-through" {...props} />
+  ),
+  em: ({ node, ...props }: any) => (
+    <em className="italic text-gray-700" {...props} />
+  ),
+  strong: ({ node, ...props }: any) => (
+    <strong className="font-bold text-gray-900" {...props} />
+  ),
+  mark: ({ node, ...props }: any) => (
+    <mark className="bg-yellow-200 px-1 rounded" {...props} />
+  ),
+  sub: ({ node, ...props }: any) => (
+    <sub className="text-sm" {...props} />
+  ),
+  sup: ({ node, ...props }: any) => (
+    <sup className="text-sm" {...props} />
+  ),
+  div: ({ node, className, ...props }: any) => {
+    const classMapping: ClassMapping = {
+      'highlight': 'bg-yellow-50 p-4 rounded-lg border border-yellow-200 my-4',
+      'note': 'bg-blue-50 p-4 rounded-lg border border-blue-200 my-4',
+      'warning': 'bg-red-50 p-4 rounded-lg border border-red-200 my-4',
+      'text-black': 'text-gray-900',
+      'text-white': 'text-white',
+    };
+
+    const classes = className && className in classMapping 
+      ? classMapping[className as keyof ClassMapping]
+      : '';
+
+    return (
+      <div className={classes} {...props} />
+    );
+  },
 };
 
 async function getProject(slug: string) {
@@ -63,45 +173,74 @@ async function getProject(slug: string) {
   }
 }
 
-export default async function ProjectDetail({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
-  const { slug } = await params;
-  const project = await getProject(slug);
+// Generate metadata for the page
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  try {
+    const project = await fetchAPI('projects', {
+      filters: {
+        slug: {
+          $eq: params.slug
+        }
+      },
+      populate: ['cover', 'categories', 'block']
+    });
 
-  if (!project) {
+    if (!project.data?.[0]) {
+      return defaultMetadata;
+    }
+
+    const projectData = project.data[0];
+    const seoBlock = projectData.block?.find((b: any) => b.__component === 'shared.seo');
+
+    return {
+      ...defaultMetadata,
+      title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
+      description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description,
+      openGraph: {
+        ...defaultMetadata.openGraph,
+        title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
+        description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description as string,
+      },
+      twitter: {
+        ...defaultMetadata.twitter,
+        title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
+        description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description as string,
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching project metadata:', error);
+    return defaultMetadata;
+  }
+}
+
+export default async function ProjectDetail({ params }: { params: { slug: string } }) {
+  const project = await fetchAPI('projects', {
+    filters: {
+      slug: {
+        $eq: params.slug
+      }
+    },
+    populate: ['cover', 'categories', 'block']
+  });
+
+  if (!project.data?.[0]) {
     return notFound();
   }
 
-  const { title, description, block, cover, publishedAt } = project;
-  
-  // Show the under construction page if the project isn't published
-  if (!publishedAt) {
-    return (
-      <>
-        <ArticleHeader />
-        <div className="pt-20">
-          <UnderConstructionPage title={title} />
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
-  const coverUrl = cover?.formats?.medium?.url || cover?.formats?.small?.url || cover?.url;
+  const projectData = project.data[0];
+  const coverUrl = projectData.cover?.formats?.large?.url || projectData.cover?.formats?.medium?.url || projectData.cover?.url;
+  const richTextBlock = projectData.block?.find((b: any) => b.__component === 'shared.rich-text');
 
   return (
     <>
       <ArticleHeader />
-      <article className="min-h-screen bg-white pt-20 relative">
-        <ShareButtons url="" title={title} description={description} />
+      <main className="min-h-screen bg-white pt-20">
+        {/* Hero Section */}
         <div className="relative w-full h-[60vh] min-h-[500px]">
           {coverUrl ? (
             <Image
               src={coverUrl}
-              alt={title}
+              alt={projectData.title || 'Project cover image'}
               fill
               className="object-cover"
               priority
@@ -111,17 +250,23 @@ export default async function ProjectDetail({
           )}
           
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/65 to-black/50" />
-
-          {/* Additional center overlay for better text readability */}
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60" />
 
           {/* Content overlay */}
-          <div className="absolute inset-0">
-            {/* Categories - positioned in upper right */}
-            {project.categories && project.categories.length > 0 && (
-              <div className="absolute top-6 right-6 flex flex-wrap justify-end gap-2 max-w-[50%]">
-                {project.categories.map((category: any) => (
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-center text-white mb-6 max-w-4xl">
+              {projectData.title}
+            </h1>
+            {projectData.description && (
+              <p className="text-xl md:text-2xl text-white/90 text-center max-w-2xl">
+                {projectData.description}
+              </p>
+            )}
+
+            {/* Categories */}
+            {projectData.categories && projectData.categories.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2 mt-6">
+                {projectData.categories.map((category: any) => (
                   <span
                     key={category.id}
                     className="text-sm text-white bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full shadow-sm"
@@ -131,151 +276,31 @@ export default async function ProjectDetail({
                 ))}
               </div>
             )}
-
-            {/* Centered content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-              {/* Title */}
-              <h1 className="text-4xl md:text-6xl font-bold text-center text-white mb-4 max-w-4xl">
-                {title}
-              </h1>
-
-              {/* Description */}
-              {description && (
-                <p className="text-lg md:text-xl text-white/90 text-center mb-6 max-w-3xl">
-                  {description}
-                </p>
-              )}
-
-              {/* Metadata */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-white/90 text-sm">
-                {project.publishedAt && (
-                  <time dateTime={project.publishedAt} className="flex items-center">
-                    <span className="mr-2">📅</span>
-                    {new Date(project.publishedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  </time>
-                )}
-                {project.author && (
-                  <div className="flex items-center">
-                    <span className="mr-2">👤</span>
-                    {project.author.name}
-                  </div>
-                )}
-                {project.status && (
-                  <div className="px-4 py-1 bg-pink-500 text-white rounded-full shadow-lg">
-                    {project.status}
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </div>
 
+        {/* Project Content */}
         <div className="max-w-4xl mx-auto px-4 py-12">
-          {/* Project Link */}
-          {project.link && (
-            <div className="mb-8 text-center">
-              <a 
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors shadow-lg group"
+          {/* Rich Text Content */}
+          {richTextBlock && (
+            <div className="prose prose-lg max-w-none">
+              <ReactMarkdown
+                remarkPlugins={[
+                  remarkGfm,
+                  remarkMath,
+                  remarkFlexibleMarkers,
+                  remarkBreaks,
+                  remarkEmoji
+                ]}
+                rehypePlugins={[rehypeRaw, rehypeKatex, rehypePrism]}
+                components={mdComponents}
               >
-                <span className="mr-2">🔗</span>
-                View Project
-                <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-              </a>
+                {richTextBlock.body}
+              </ReactMarkdown>
             </div>
           )}
-
-          {/* Technologies */}
-          {project.technologies && project.technologies.length > 0 && (
-            <div className="mb-12 p-6 bg-gray-50 rounded-xl">
-              <h2 className="text-lg font-semibold mb-4 text-gray-900">Technologies Used</h2>
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.map((tech: string, index: number) => (
-                  <span 
-                    key={index}
-                    className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-sm shadow-sm"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Content */}
-          <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-pink-500 prose-a:no-underline hover:prose-a:underline prose-strong:text-gray-900 prose-code:text-pink-500 prose-code:bg-pink-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100">
-            {block?.map((contentBlock: any, idx: number) => {
-              switch (contentBlock.__component) {
-                case "shared.rich-text":
-                  return (
-                    <div key={`${contentBlock.__component}-${contentBlock.id}-${idx}`} className="mb-8">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkFlexibleMarkers]}
-                        rehypePlugins={[rehypeRaw]}
-                        components={{
-                          ...mdComponents,
-                          // Override specific components for better markdown support
-                          code: ({ node, inline, className, children, ...props }: any) => {
-                            const match = /language-(\w+)/.exec(className || '');
-                            const language = match ? match[1] : '';
-                            
-                            return inline ? (
-                              <code className="bg-pink-50 text-pink-500 px-1 py-0.5 rounded text-sm font-mono" {...props}>
-                                {children}
-                              </code>
-                            ) : (
-                              <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto">
-                                <code className={`language-${language}`} {...props}>
-                                  {children}
-                                </code>
-                              </pre>
-                            );
-                          }
-                        }}
-                      >
-                        {contentBlock.body}
-                      </ReactMarkdown>
-                    </div>
-                  );
-                case "shared.quote":
-                  return (
-                    <blockquote
-                      key={`${contentBlock.__component}-${contentBlock.id}-${idx}`}
-                      className="my-8 border-l-4 border-pink-500 pl-6 italic text-gray-700 py-4 bg-gray-50"
-                    >
-                      <p className="mb-2">{contentBlock.body}</p>
-                      {contentBlock.title && (
-                        <cite className="block text-sm font-semibold text-gray-900 not-italic">
-                          — {contentBlock.title}
-                        </cite>
-                      )}
-                    </blockquote>
-                  );
-                case "shared.media":
-                  return (
-                    <div key={`${contentBlock.__component}-${contentBlock.id}-${idx}`} className="my-8 p-4 bg-gray-50 rounded-lg text-center text-gray-500">
-                      [Media content will be rendered here]
-                    </div>
-                  );
-                case "shared.slider":
-                  return (
-                    <div key={`${contentBlock.__component}-${contentBlock.id}-${idx}`} className="my-8 p-4 bg-gray-50 rounded-lg text-center text-gray-500">
-                      [Slider content will be rendered here]
-                    </div>
-                  );
-                default:
-                  return null;
-              }
-            })}
-          </div>
         </div>
-      </article>
+      </main>
       <Footer />
     </>
   );

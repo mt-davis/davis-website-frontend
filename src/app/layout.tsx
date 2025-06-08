@@ -3,10 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Great_Vibes } from 'next/font/google';
 import { Montserrat } from 'next/font/google';
 import "./globals.css";
-import { defaultMetadata } from '@/lib/metadata';
+import { defaultMetadata } from '@/lib/seo';
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import ContactBubble from '@/components/ContactBubble';
+import 'katex/dist/katex.min.css';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

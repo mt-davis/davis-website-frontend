@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const textArray = ["is transformational", "is changing", "is a journey", "is LIFE!"];
+const textArray = ["Transformational", "Changing", " A journey", "LIFE!"];
 const typingDelay = 200;
 const erasingDelay = 100;
 const newTextDelay = 2000;
