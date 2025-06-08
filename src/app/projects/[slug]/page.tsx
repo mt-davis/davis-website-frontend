@@ -18,6 +18,12 @@ import { Metadata } from 'next';
 import { defaultMetadata } from '@/lib/seo';
 import { fetchAPI } from '@/lib/api';
 
+interface PageProps {
+  params: {
+    slug: string;
+  };
+}
+
 // Define the class mapping type
 type ClassMapping = {
   'highlight': string;
@@ -213,7 +219,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function ProjectDetail({ params }: { params: { slug: string } }) {
+export default async function ProjectDetail(props: PageProps) {
+  const { params } = props;
   const project = await fetchAPI('projects', {
     filters: {
       slug: {

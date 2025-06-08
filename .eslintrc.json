@@ -2,12 +2,16 @@
   "extends": [
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
-    "plugin:security/recommended"
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended"
   ],
-  "plugins": ["@typescript-eslint", "security"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
   "rules": {
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
     "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "security/detect-object-injection": "warn",
     "security/detect-non-literal-regexp": "warn",
     "security/detect-unsafe-regex": "error",
@@ -16,5 +20,10 @@
     "security/detect-no-csrf-before-method-override": "error",
     "security/detect-possible-timing-attacks": "warn",
     "security/detect-pseudoRandomBytes": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   }
 } 
