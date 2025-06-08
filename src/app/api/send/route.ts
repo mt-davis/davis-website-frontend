@@ -47,7 +47,18 @@ function isContactForm(data: FormData): data is ContactFormData {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // Parse FormData instead of JSON
+    const formData = await request.formData();
+    const files = formData.getAll('attachments') as File[];
+    
+    // Convert FormData to object for validation
+    const body: Record<string, any> = {};
+    formData.forEach((value, key) => {
+      if (key !== 'attachments') {
+        body[key] = value;
+      }
+    });
+    
     console.log('Received request body:', body);
 
     // Validate request body
@@ -63,8 +74,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const formData = result.data;
-    const { name, email, hcaptchaToken } = formData;
+    const validatedData = result.data;
+    const { name, email, hcaptchaToken } = validatedData;
 
     // Skip hCaptcha verification if using test key in development
     const isTestKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY === '10000000-ffff-ffff-ffff-000000000001';
@@ -91,34 +102,47 @@ export async function POST(request: Request) {
       }
     }
 
+    // Process file attachments
+    const attachments = await Promise.all(
+      files.map(async (file) => {
+        const buffer = await file.arrayBuffer();
+        return {
+          filename: file.name,
+          content: Buffer.from(buffer),
+        };
+      })
+    );
+
     // Prepare email content based on submission type
-    const emailContent = isRFPForm(formData)
+    const emailContent = isRFPForm(validatedData)
       ? `Executive Coach RFP Submission
 
 Name: ${name}
 Email: ${email}
-${formData.company ? `Company/Organization: ${formData.company}\n` : ''}
-${formData.experience ? `\nCoaching Experience:\n${formData.experience}` : ''}
-${formData.approach ? `\nCoaching Approach:\n${formData.approach}` : ''}
-${formData.references ? `\nReferences:\n${formData.references}` : ''}`
+${validatedData.company ? `Company/Organization: ${validatedData.company}\n` : ''}
+${validatedData.experience ? `\nCoaching Experience:\n${validatedData.experience}` : ''}
+${validatedData.approach ? `\nCoaching Approach:\n${validatedData.approach}` : ''}
+${validatedData.references ? `\nReferences:\n${validatedData.references}` : ''}
+${files.length > 0 ? `\nAttachments: ${files.map(f => f.name).join(', ')}` : ''}`
       : `Contact Form Submission
 
 Name: ${name}
 Email: ${email}
-Subject: ${formData.subject}
+Subject: ${validatedData.subject}
 
 Message:
-${formData.message}`;
+${validatedData.message}`;
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
       from: 'Contact Form <onboarding@resend.dev>',
       to: process.env.CONTACT_EMAIL!,
       replyTo: email,
-      subject: isRFPForm(formData)
-        ? `Executive Coach RFP: ${name}${formData.company ? ` from ${formData.company}` : ''}`
-        : `Contact Form: ${formData.subject}`,
+      subject: isRFPForm(validatedData)
+        ? `Executive Coach RFP: ${name}${validatedData.company ? ` from ${validatedData.company}` : ''}`
+        : `Contact Form: ${validatedData.subject}`,
       text: emailContent,
+      attachments: attachments.length > 0 ? attachments : undefined,
     });
 
     if (error) {

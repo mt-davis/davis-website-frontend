@@ -6,6 +6,7 @@ import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import confetti from 'canvas-confetti';
 import { UpgradeBanner } from '@/components/ui/upgrade-banner';
+import { Upload, X } from 'lucide-react';
 
 // Import the type without using the default import
 const HCaptcha = dynamic<any>(() => import('@hcaptcha/react-hcaptcha'), {
@@ -46,10 +47,12 @@ export default function ExecutiveCoachRFPForm() {
     approach: '',
     references: '',
   });
+  const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const captchaRef = useRef<any>(null);
   const [siteKey, setSiteKey] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const envSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
@@ -59,6 +62,15 @@ export default function ExecutiveCoachRFPForm() {
     }
     setSiteKey(envSiteKey);
   }, []);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    setFiles(prev => [...prev, ...selectedFiles]);
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,12 +88,25 @@ export default function ExecutiveCoachRFPForm() {
         throw new Error('Please complete the captcha verification');
       }
       
-      const formPayload = { ...formData, hcaptchaToken: token };
+      // Create FormData instance to handle files
+      const formDataToSend = new FormData();
+      
+      // Append form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
+      
+      // Append files
+      files.forEach((file) => {
+        formDataToSend.append('attachments', file);
+      });
+      
+      // Append hCaptcha token
+      formDataToSend.append('hcaptchaToken', token);
       
       const response = await fetch('/api/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formPayload),
+        body: formDataToSend, // Send as FormData instead of JSON
       });
 
       const data = await response.json();
@@ -104,6 +129,7 @@ export default function ExecutiveCoachRFPForm() {
 
       setStatus('success');
       setFormData({ name: '', email: '', company: '', experience: '', approach: '', references: '' });
+      setFiles([]);
       captchaRef.current?.resetCaptcha();
       
       // Shoot confetti on success
@@ -247,6 +273,58 @@ export default function ExecutiveCoachRFPForm() {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-colors"
                   placeholder="Please provide two references with similar leadership coaching objectives"
                 />
+              </div>
+
+              {/* File Attachment Section */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Attachments
+                </label>
+                <div className="space-y-2">
+                  {/* File Input Button */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Upload size={20} className="text-gray-500" />
+                    <span>Add Files</span>
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept=".pdf,.doc,.docx,.txt,.rtf"
+                  />
+                  
+                  {/* File List */}
+                  {files.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {files.map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+                        >
+                          <span className="text-sm text-gray-600 truncate">
+                            {file.name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(index)}
+                            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+                          >
+                            <X size={16} className="text-gray-500" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    Accepted file types: PDF, DOC, DOCX, TXT, RTF
+                  </p>
+                </div>
               </div>
 
               {/* HCaptcha */}
