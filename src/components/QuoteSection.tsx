@@ -9,20 +9,21 @@ export default function QuoteSection() {
           <div className="absolute -top-8 left-0 text-6xl text-gray-400 font-serif">"</div>
           
           {/* Quote text */}
-          <blockquote className="relative z-10">
-            <p className="text-2xl md:text-3xl text-gray-900 font-light leading-relaxed text-center italic">
-              Leadership is not about being in charge. It's about taking care of those in your charge.
-            </p>
-            
-            {/* Author */}
-            <footer className="mt-8">
-              <div className="flex items-center justify-center">
-                <div className="h-px w-12 bg-gray-500 mr-4"></div>
-                <cite className="text-gray-800 not-italic font-medium">Simon Sinek</cite>
-                <div className="h-px w-12 bg-gray-500 ml-4"></div>
-              </div>
-            </footer>
+          <blockquote className="text-2xl font-semibold text-gray-900 mb-4">
+            &ldquo;The best way to predict the future is to create it.&rdquo;
           </blockquote>
+          <p className="text-gray-600">
+            Let&apos;s create something extraordinary together.
+          </p>
+          
+          {/* Author */}
+          <footer className="mt-8">
+            <div className="flex items-center justify-center">
+              <div className="h-px w-12 bg-gray-500 mr-4"></div>
+              <cite className="text-gray-800 not-italic font-medium">Simon Sinek</cite>
+              <div className="h-px w-12 bg-gray-500 ml-4"></div>
+            </div>
+          </footer>
         </div>
       </div>
     </section>

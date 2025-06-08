@@ -1,11 +1,9 @@
 "use client";
 
+import React from 'react';
 import Link from 'next/link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLinkedin } from '@fortawesome/free-brands-svg-icons';
-import { faMediumM } from '@fortawesome/free-brands-svg-icons';
-import HamburgerMenu from './HamburgerMenu';
 import Image from 'next/image';
+import HamburgerMenu from './HamburgerMenu';
 import TypedText from './TypedText';
 import { useState, useEffect } from 'react';
 

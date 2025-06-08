@@ -41,15 +41,14 @@ export default function UnderConstructionPage({ title }: { title: string }) {
       </div>
 
       {/* Message */}
-      <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4 animate-fade-in -mt-4">
-        Under Construction!
+      <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        &ldquo;Under Construction&rdquo;
       </h1>
       <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">
         "{title}"
       </h2>
-      <p className="text-xl text-gray-600 mb-8 max-w-2xl animate-fade-in-delay">
-        Our team is hard at work building something amazing.
-        Check back soon to see the finished product! 🎯
+      <p className="text-xl text-gray-600 mb-8">
+        We&apos;re working hard to bring you something amazing!
       </p>
 
       {/* Fun Facts with slide-up effect */}

@@ -369,7 +369,7 @@ export default function ExecutiveCoachRFPForm() {
                     px-8 py-3 rounded-lg text-white font-semibold
                     ${status === 'loading'
                       ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-pink-500 hover:bg-pink-600 active:bg-pink-700'}
+                      : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'}
                     transition-colors duration-200
                     flex items-center space-x-2
                   `}

@@ -19,7 +19,12 @@ export default function HeroSection() {
 
         {/* Center column: description */}
         <div className="prose flex-1 space-y-6">
-          <p>For the last two decades, I've been at the intersection of IT excellence and visionary leadership, cultivating environments where innovation isn't just a buzzword, but a daily reality. I've not only witnessed the evolution of IT, I've been a driving force behind it.</p>
+          <p className="text-lg text-gray-600 mb-8">
+            I&apos;m a seasoned technology leader with over 20 years of experience. I&apos;ve led teams at Fortune 500 companies, startups, and everything in between. Today, I&apos;m focused on helping organizations build high-performing teams and deliver exceptional results. Let&apos;s work together to unlock your team&apos;s full potential.
+          </p>
+          <p className="text-lg text-gray-600 mb-8">
+            I&apos;m passionate about helping leaders and organizations thrive in today&apos;s rapidly evolving business landscape. Whether you&apos;re scaling your team, navigating a transformation, or seeking to enhance your leadership capabilities, I&apos;m here to help.
+          </p>
           
           <div className="w-full h-px bg-gray-200 my-4"></div>
           

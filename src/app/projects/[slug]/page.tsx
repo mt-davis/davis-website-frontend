@@ -18,11 +18,10 @@ import { Metadata } from 'next';
 import { defaultMetadata } from '@/lib/seo';
 import { fetchAPI } from '@/lib/api';
 
-interface PageProps {
-  params: {
-    slug: string;
-  };
-}
+type PageProps = {
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
 
 // Define the class mapping type
 type ClassMapping = {
@@ -205,22 +204,24 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       openGraph: {
         ...defaultMetadata.openGraph,
         title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
-        description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description as string,
-      },
-      twitter: {
-        ...defaultMetadata.twitter,
-        title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
-        description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description as string,
+        description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description,
+        images: projectData.cover?.data?.attributes?.url ? [
+          {
+            url: projectData.cover.data.attributes.url,
+            width: 1200,
+            height: 630,
+            alt: projectData.title
+          }
+        ] : defaultMetadata.openGraph?.images || []
       }
     };
   } catch (error) {
-    console.error('Error fetching project metadata:', error);
+    console.error('Error generating metadata:', error);
     return defaultMetadata;
   }
 }
 
-export default async function ProjectDetail(props: PageProps) {
-  const { params } = props;
+export default async function ProjectDetail({ params }: PageProps) {
   const project = await fetchAPI('projects', {
     filters: {
       slug: {
@@ -231,7 +232,7 @@ export default async function ProjectDetail(props: PageProps) {
   });
 
   if (!project.data?.[0]) {
-    return notFound();
+    notFound();
   }
 
   const projectData = project.data[0];
