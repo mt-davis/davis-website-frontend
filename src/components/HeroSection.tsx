@@ -26,20 +26,22 @@ export default function HeroSection() {
             I&apos;m passionate about helping leaders and organizations thrive in today&apos;s rapidly evolving business landscape. Whether you&apos;re scaling your team, navigating a transformation, or seeking to enhance your leadership capabilities, I&apos;m here to help.
           </p>
           
-          <div className="w-full h-px bg-gray-200 my-4"></div>
-          
-          <p>I've been at the forefront of the IT industry, pioneering solutions that redefine what's possible. I've cultivated a philosophy where vision meets execution, leading high-caliber teams to break barriers and set new benchmarks.</p>
-          <p>My journey has been more than just overseeing projects; it's been about inspiring change, embracing the relentless pace of technological advancement, and empowering organizations to not just adapt, but lead in a constantly evolving digital landscape.</p>
+          <div className="text-lg text-gray-600 mb-8"></div>
+          <p className="text-lg text-gray-600 mb-8">
+           I've been at the forefront of the IT industry, pioneering solutions that redefine what's possible. I've cultivated a philosophy where vision meets execution, leading high-caliber teams to break barriers and set new benchmarks.</p>
+          <p className="text-lg text-gray-600 mb-8">
+            My journey has been more than just overseeing projects; it's been about inspiring change, embracing the relentless pace of technological advancement, and empowering organizations to not just adapt, but lead in a constantly evolving digital landscape.</p>
         </div>
 
         {/* Right column: profile image */}
-        <div className="w-full md:w-80 flex-shrink-0 flex justify-center md:justify-start">
-          <div className="relative w-64 md:w-80 aspect-square">
+        <div className="w-full md:w-auto flex-shrink-0 flex justify-center">
+          <div className="relative">
             <Image
               src="/images/profile-pic.png"
               alt="Marquese T Davis Profile"
-              fill
-              className="object-cover rounded-lg"
+              width={250}  // Mobile size
+              height={250} // Mobile size
+              className="object-cover rounded-lg md:w-[350px] md:h-[350px]"
             />
           </div>
         </div>

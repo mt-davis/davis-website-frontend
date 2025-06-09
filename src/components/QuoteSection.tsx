@@ -18,7 +18,7 @@ export default function QuoteSection() {
           
           {/* Author */}
           <footer className="mt-8">
-            <div className="flex items-center justify-center">
+            <div className="flex items-center">
               <div className="h-px w-12 bg-gray-500 mr-4"></div>
               <cite className="text-gray-800 not-italic font-medium">Simon Sinek</cite>
               <div className="h-px w-12 bg-gray-500 ml-4"></div>
