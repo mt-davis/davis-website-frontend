@@ -37,11 +37,11 @@ export default function LandingPage() {
           </div>
           <div className="space-y-4">
             <p className="text-gray-600 leading-relaxed">
-              In the dynamic landscape of technology and digital growth, my approach to Strategy and Insight is shaped by a commitment to innovation and a deep understanding of market dynamics.
+            In the dynamic landscape of technology and digital growth, my approach to Strategy and Insight is shaped by a commitment to innovation and a deep understanding of market dynamics. Strategy, for me, is about charting new courses and embracing the transformative power of change. It involves not just envisioning what could be but actively shaping the future by being acutely aware of current trends.
             </p>
             <div className="w-full h-px bg-gray-200 my-4"></div>
             <p className="text-gray-600 leading-relaxed">
-              Insight is crucial in this strategic journey. It revolves around a data-centric approach to decision-making.
+            Insight is crucial in this strategic journey. It revolves around a data-centric approach to decision-making. Delving into data allows us to decode complex patterns, anticipate market shifts, and grasp customer preferences in a comprehensive manner. This blend of strategic vision and insightful data analysis ensures that our business moves are both progressive and grounded in real, actionable evidence.
             </p>
           </div>
         </div>
@@ -58,7 +58,7 @@ export default function LandingPage() {
           </div>
           <div className="space-y-4">
             <p className="text-gray-600 leading-relaxed">
-              Digital Transformation is about the seamless adoption and integration of digital technology into all aspects of a business.
+            To me, Digital Transformation is about the seamless adoption and integration of digital technology into all aspects of a business. It's about fundamentally altering how we operate and deliver value to customers. It's a continuous journey of evolution and adaptation, aiming to improve efficiency, enhance customer experience, and foster a culture of innovation that keeps a business at the forefront of the digital revolution.
             </p>
           </div>
         </div>
@@ -75,7 +75,11 @@ export default function LandingPage() {
           </div>
           <div className="space-y-4">
             <p className="text-gray-600 leading-relaxed">
-              Effective leadership is about cultivating an environment of empowerment and innovation.
+            In my experience, effective leadership is about cultivating an environment of empowerment and innovation. It's about setting a clear vision, inspiring teams to align with that vision, and then providing them the autonomy and resources to experiment, learn, and grow.
+            </p>
+            <div className="w-full h-px bg-gray-200 my-4"></div>
+            <p className="text-gray-600 leading-relaxed">
+            Good leaders create more leaders, not just followers. They encourage creativity, welcome diverse perspectives, and view setbacks as valuable learning opportunities. This approach is crucial for fostering a culture where innovation thrives and where every team member feels valued and motivated to contribute to the collective success.
             </p>
           </div>
         </div>
