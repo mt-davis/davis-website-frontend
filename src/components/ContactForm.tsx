@@ -1,18 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import type { ComponentType } from 'react';
-
-// Import the type without using the default import
-const HCaptcha = dynamic<any>(() => import('@hcaptcha/react-hcaptcha'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
-      <div className="animate-pulse">Loading captcha...</div>
-    </div>
-  ),
-});
+import { Turnstile } from '@marsidev/react-turnstile';
 
 interface ContactFormProps {
   onClose: () => void;
@@ -32,9 +21,9 @@ export default function ContactForm({ onClose }: ContactFormProps) {
 
   useEffect(() => {
     // Get the site key from environment variables
-    const envSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
+    const envSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     if (!envSiteKey) {
-      console.error('NEXT_PUBLIC_HCAPTCHA_SITE_KEY is not configured');
+      console.error('NEXT_PUBLIC_TURNSTILE_SITE_KEY is not configured');
       return;
     }
     setSiteKey(envSiteKey);
@@ -46,18 +35,15 @@ export default function ContactForm({ onClose }: ContactFormProps) {
     setErrorMessage('');
 
     try {
-      let token = captchaRef.current?.getResponse();
-      
+      let token = captchaRef.current?.getResponse?.();
       if (!token) {
-        token = await captchaRef.current?.execute() || undefined;
+        // Turnstile auto-executes, but fallback if needed
+        token = captchaRef.current?.getValue?.();
       }
-      
       if (!token) {
         throw new Error('Please complete the captcha verification');
       }
-      
-      const formPayload = { ...formData, hcaptchaToken: token };
-      
+      const formPayload = { ...formData, turnstileToken: token };
       const response = await fetch('/api/send', {
         method: 'POST',
         headers: {
@@ -65,9 +51,7 @@ export default function ContactForm({ onClose }: ContactFormProps) {
         },
         body: JSON.stringify(formPayload)
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         let errorMessage = data.error || 'Failed to send message';
         if (data.details) {
@@ -83,11 +67,9 @@ export default function ContactForm({ onClose }: ContactFormProps) {
         }
         throw new Error(errorMessage);
       }
-
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
-      captchaRef.current?.resetCaptcha();
-      // Close the modal after successful submission
+      captchaRef.current?.reset?.();
       setTimeout(() => {
         onClose();
         setStatus('idle');
@@ -169,28 +151,18 @@ export default function ContactForm({ onClose }: ContactFormProps) {
         />
       </div>
 
-      {/* HCaptcha */}
+      {/* Turnstile Captcha */}
       <div className="flex justify-center">
         <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
           {siteKey && (
-            <HCaptcha
-              sitekey={siteKey}
-              size="normal"
-              onError={(err: string) => {
-                console.error('hCaptcha error:', err);
-                setStatus('error');
-                setErrorMessage('Failed to load captcha. Please check your internet connection.');
-              }}
-              onLoad={() => {
-                console.log('hCaptcha loaded successfully with site key:', siteKey);
-              }}
-              onVerify={(token: string) => {
-                console.log('hCaptcha verified with token:', token);
-              }}
-              onExpire={() => {
-                console.log('hCaptcha expired');
+            <Turnstile
+              siteKey={siteKey}
+              onSuccess={(token: string) => {
+                // Optionally store token in ref if needed
+                if (captchaRef.current) captchaRef.current.token = token;
               }}
               ref={captchaRef}
+              options={{ theme: 'light' }}
             />
           )}
         </div>

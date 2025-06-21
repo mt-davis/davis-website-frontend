@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 // Define test key constant
 const TEST_SITE_KEY = '10000000-ffff-ffff-ffff-000000000001';
@@ -16,14 +16,14 @@ export default function ContactBubble() {
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<any>(null);
   const [siteKey, setSiteKey] = useState<string>('');
 
   useEffect(() => {
     // Get the site key from environment variables
-    const envSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
+    const envSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
     if (!envSiteKey) {
-      console.error('NEXT_PUBLIC_HCAPTCHA_SITE_KEY is not configured');
+      console.error('NEXT_PUBLIC_TURNSTILE_SITE_KEY is not configured');
       return;
     }
     setSiteKey(envSiteKey);
@@ -35,17 +35,14 @@ export default function ContactBubble() {
     setErrorMessage('');
 
     try {
-      let token = captchaRef.current?.getResponse();
-      
+      let token = captchaRef.current?.getResponse?.();
       if (!token) {
-        token = await captchaRef.current?.execute() || undefined;
+        token = captchaRef.current?.getValue?.();
       }
-      
       if (!token) {
         throw new Error('Please complete the captcha verification');
       }
-      
-      const formPayload = { ...formData, hcaptchaToken: token };
+      const formPayload = { ...formData, turnstileToken: token };
       
       const response = await fetch('/api/send', {
         method: 'POST',
@@ -75,7 +72,7 @@ export default function ContactBubble() {
 
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
-      captchaRef.current?.resetCaptcha();
+      captchaRef.current?.reset?.();
       // Close the modal after successful submission
       setTimeout(() => {
         setIsOpen(false);
@@ -218,31 +215,21 @@ export default function ContactBubble() {
                   />
                 </div>
 
-                {/* HCaptcha */}
+                {/* Turnstile Captcha */}
                 <div className="flex justify-center">
                   <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
-                    <HCaptcha
-                      ref={captchaRef}
-                      sitekey={siteKey}
-                      size="normal"
-                      onError={(err) => {
-                        console.error('hCaptcha error:', err);
-                        setStatus('error');
-                        setErrorMessage('Failed to load captcha. Please check your internet connection.');
-                      }}
-                      onLoad={() => {
-                        console.log('hCaptcha loaded successfully with site key:', siteKey);
-                      }}
-                      onVerify={(token) => {
-                        console.log('hCaptcha verified with token:', token);
-                      }}
-                      onExpire={() => {
-                        console.log('hCaptcha expired');
-                      }}
-                    />
+                    {siteKey && (
+                      <Turnstile
+                        siteKey={siteKey}
+                        onSuccess={(token: string) => {
+                          if (captchaRef.current) captchaRef.current.token = token;
+                        }}
+                        ref={captchaRef}
+                        options={{ theme: 'light' }}
+                      />
+                    )}
                   </div>
                 </div>
-
                 {/* Status Messages */}
                 {status === 'error' && (
                   <div className="text-red-600 text-center p-3 bg-red-50 rounded-lg whitespace-pre-wrap">
@@ -254,7 +241,6 @@ export default function ContactBubble() {
                     Message sent successfully! I'll get back to you soon.
                   </div>
                 )}
-
                 {/* Submit Button */}
                 <div className="flex justify-center">
                   <button

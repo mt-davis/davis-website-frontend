@@ -7,16 +7,7 @@ import Footer from '@/components/Footer';
 import confetti from 'canvas-confetti';
 import { UpgradeBanner } from '@/components/ui/upgrade-banner';
 import { Upload, X } from 'lucide-react';
-
-// Import the type without using the default import
-const HCaptcha = dynamic<any>(() => import('@hcaptcha/react-hcaptcha'), {
-  ssr: false,
-  loading: () => (
-    <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
-      <div className="animate-pulse">Loading captcha...</div>
-    </div>
-  ),
-});
+import { Turnstile } from '@marsidev/react-turnstile';
 
 function shootConfetti() {
   // Left cannon
@@ -55,9 +46,10 @@ export default function ExecutiveCoachRFPForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const envSiteKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY;
+    const envSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    console.log('Turnstile site key:', envSiteKey);
     if (!envSiteKey) {
-      console.error('NEXT_PUBLIC_HCAPTCHA_SITE_KEY is not configured');
+      console.error('NEXT_PUBLIC_TURNSTILE_SITE_KEY is not configured');
       return;
     }
     setSiteKey(envSiteKey);
@@ -78,39 +70,30 @@ export default function ExecutiveCoachRFPForm() {
     setErrorMessage('');
 
     try {
-      let token = captchaRef.current?.getResponse();
-      
+      let token = captchaRef.current?.getResponse?.();
       if (!token) {
-        token = await captchaRef.current?.execute() || undefined;
+        token = captchaRef.current?.getValue?.();
       }
-      
       if (!token) {
         throw new Error('Please complete the captcha verification');
       }
-      
       // Create FormData instance to handle files
       const formDataToSend = new FormData();
-      
       // Append form fields
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
       });
-      
       // Append files
       files.forEach((file) => {
         formDataToSend.append('attachments', file);
       });
-      
-      // Append hCaptcha token
-      formDataToSend.append('hcaptchaToken', token);
-      
+      // Append Turnstile token
+      formDataToSend.append('turnstileToken', token);
       const response = await fetch('/api/send', {
         method: 'POST',
         body: formDataToSend // FormData will automatically set the correct content-type
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         let errorMessage = data.error || 'Failed to send message';
         if (data.details) {
@@ -126,15 +109,12 @@ export default function ExecutiveCoachRFPForm() {
         }
         throw new Error(errorMessage);
       }
-
       setStatus('success');
       setFormData({ name: '', email: '', company: '', experience: '', approach: '', references: '' });
       setFiles([]);
-      captchaRef.current?.resetCaptcha();
-      
+      captchaRef.current?.reset?.();
       // Shoot confetti on success
       shootConfetti();
-      
       // Shoot another round of confetti after a short delay
       setTimeout(() => {
         shootConfetti();
@@ -275,74 +255,65 @@ export default function ExecutiveCoachRFPForm() {
                 />
               </div>
 
-              {/* File Attachment Section */}
-              <div className="space-y-2">
+              {/* File Upload Section */}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Attachments
                 </label>
-                <div className="space-y-2">
-                  {/* File Input Button */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <Upload size={20} className="text-gray-500" />
-                    <span>Add Files</span>
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.txt,.rtf"
-                  />
-                  
-                  {/* File List */}
-                  {files.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      {files.map((file, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
-                        >
-                          <span className="text-sm text-gray-600 truncate">
-                            {file.name}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removeFile(index)}
-                            className="p-1 hover:bg-gray-200 rounded-full transition-colors"
-                          >
-                            <X size={16} className="text-gray-500" />
-                          </button>
-                        </div>
-                      ))}
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg relative">
+                  <div className="space-y-1 text-center">
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <div className="flex text-sm text-gray-600">
+                      <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-pink-600 hover:text-pink-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-pink-500">
+                        <span>Upload files</span>
+                        <input
+                          id="file-upload"
+                          name="file-upload"
+                          type="file"
+                          className="sr-only"
+                          multiple
+                          onChange={handleFileChange}
+                          ref={fileInputRef}
+                        />
+                      </label>
+                      <p className="pl-1">or drag and drop</p>
                     </div>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    Accepted file types: PDF, DOC, DOCX, TXT, RTF
-                  </p>
+                    <p className="text-xs text-gray-500">
+                      PDF, DOC, DOCX up to 10MB each
+                    </p>
+                  </div>
                 </div>
+                {/* Display uploaded files */}
+                {files.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    {files.map((file, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <span className="text-sm text-gray-600">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* HCaptcha */}
+              {/* Turnstile Captcha */}
               <div className="flex justify-center">
                 <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
                   {siteKey && (
-                    <HCaptcha
-                      sitekey={siteKey}
-                      size="normal"
-                      onError={(err: string) => {
-                        console.error('hCaptcha error:', err);
-                        setStatus('error');
-                        setErrorMessage('Failed to load captcha. Please check your internet connection.');
-                      }}
-                      onLoad={() => {
-                        console.log('hCaptcha loaded successfully');
+                    <Turnstile
+                      siteKey={siteKey}
+                      onSuccess={(token: string) => {
+                        // Optionally store token in ref if needed
+                        if (captchaRef.current) captchaRef.current.token = token;
                       }}
                       ref={captchaRef}
+                      options={{ theme: 'light' }}
                     />
                   )}
                 </div>
@@ -356,12 +327,12 @@ export default function ExecutiveCoachRFPForm() {
               )}
               {status === 'success' && (
                 <div className="text-green-600 text-center p-3 bg-green-50 rounded-lg">
-                  Your proposal has been submitted successfully! We will review it and get back to you soon.
+                  Your RFP submission has been received! We'll review it and get back to you soon.
                 </div>
               )}
 
               {/* Submit Button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center pt-4">
                 <button
                   type="submit"
                   disabled={status === 'loading'}
@@ -369,7 +340,7 @@ export default function ExecutiveCoachRFPForm() {
                     px-8 py-3 rounded-lg text-white font-semibold
                     ${status === 'loading'
                       ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-700'}
+                      : 'bg-pink-500 hover:bg-pink-600 active:bg-pink-700'}
                     transition-colors duration-200
                     flex items-center space-x-2
                   `}
@@ -380,7 +351,7 @@ export default function ExecutiveCoachRFPForm() {
                       <span>Submitting...</span>
                     </>
                   ) : (
-                    'Submit Proposal'
+                    'Submit RFP'
                   )}
                 </button>
               </div>

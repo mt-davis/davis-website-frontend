@@ -5,23 +5,23 @@ import { z } from 'zod';
 // Initialize Resend with API key
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Base email schema
-const baseEmailSchema = {
+// Base schema for common fields
+const baseSchema = {
   name: z.string().min(2).max(50),
   email: z.string().email(),
-  hcaptchaToken: z.string(),
+  turnstileToken: z.string(),
 };
 
-// Regular contact form schema
+// Contact form schema
 const contactEmailSchema = z.object({
-  ...baseEmailSchema,
-  subject: z.string().min(5).max(100),
+  ...baseSchema,
+  subject: z.string().min(3).max(100),
   message: z.string().min(10).max(1000),
 });
 
 // RFP form schema
 const rfpEmailSchema = z.object({
-  ...baseEmailSchema,
+  ...baseSchema,
   company: z.string().max(100).optional(),
   experience: z.string().max(2000).optional(),
   approach: z.string().max(2000).optional(),
@@ -38,11 +38,12 @@ type FormData = z.infer<typeof emailSchema>;
 
 // Type guards
 function isRFPForm(data: FormData): data is RFPFormData {
-  return !('subject' in data) && !('message' in data);
-}
-
-function isContactForm(data: FormData): data is ContactFormData {
-  return 'subject' in data && 'message' in data;
+  return (
+    'company' in data ||
+    'experience' in data ||
+    'approach' in data ||
+    'references' in data
+  );
 }
 
 export async function POST(request: Request) {
@@ -61,16 +62,8 @@ export async function POST(request: Request) {
           body[key] = value;
         }
       });
-    } else if (contentType?.includes('application/json')) {
-      body = await request.json();
     } else {
-      return NextResponse.json(
-        { 
-          error: 'Invalid content type',
-          details: 'Content-Type must be either multipart/form-data or application/json'
-        },
-        { status: 400 }
-      );
+      body = await request.json();
     }
 
     console.log('Received request body:', body);
@@ -89,26 +82,26 @@ export async function POST(request: Request) {
     }
 
     const validatedData = result.data;
-    const { name, email, hcaptchaToken } = validatedData;
+    const { name, email, turnstileToken } = validatedData;
 
-    // Skip hCaptcha verification if using test key in development
-    const isTestKey = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY === '10000000-ffff-ffff-ffff-000000000001';
-    
+    // Skip Turnstile verification if using test key in development
+    const isTestKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY === '1x00000000000000000000AA';
+
     if (!isTestKey) {
-      // Verify hCaptcha token in production
-      const verificationUrl = 'https://api.hcaptcha.com/siteverify';
+      // Verify Turnstile token in production
+      const verificationUrl = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
       const verificationResponse = await fetch(verificationUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({
-          secret: process.env.HCAPTCHA_SECRET_KEY!,
-          response: hcaptchaToken,
+          secret: process.env.TURNSTILE_SECRET_KEY!,
+          response: turnstileToken,
         }),
       });
 
       const verificationData = await verificationResponse.json();
       if (!verificationData.success) {
-        console.error('hCaptcha verification failed:', verificationData);
+        console.error('Turnstile verification failed:', verificationData);
         return NextResponse.json(
           { error: 'Invalid captcha', details: verificationData },
           { status: 400 }
@@ -116,7 +109,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Process file attachments
+    // Process file attachments if present
     const attachments = await Promise.all(
       files.map(async (file) => {
         const buffer = await file.arrayBuffer();
@@ -127,7 +120,7 @@ export async function POST(request: Request) {
       })
     );
 
-    // Prepare email content based on submission type
+    // Prepare email content based on form type
     const emailContent = isRFPForm(validatedData)
       ? `Executive Coach RFP Submission
 
@@ -142,10 +135,10 @@ ${files.length > 0 ? `\nAttachments: ${files.map(f => f.name).join(', ')}` : ''}
 
 Name: ${name}
 Email: ${email}
-Subject: ${validatedData.subject}
+Subject: ${(validatedData as ContactFormData).subject}
 
 Message:
-${validatedData.message}`;
+${(validatedData as ContactFormData).message}`;
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
@@ -154,7 +147,7 @@ ${validatedData.message}`;
       replyTo: email,
       subject: isRFPForm(validatedData)
         ? `Executive Coach RFP: ${name}${validatedData.company ? ` from ${validatedData.company}` : ''}`
-        : `Contact Form: ${validatedData.subject}`,
+        : `Contact Form: ${(validatedData as ContactFormData).subject}`,
       text: emailContent,
       attachments: attachments.length > 0 ? attachments : undefined,
     });

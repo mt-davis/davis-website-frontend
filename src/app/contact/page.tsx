@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
-import HCaptcha from '@hcaptcha/react-hcaptcha';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 // Define test key constant
-const TEST_SITE_KEY = '10000000-ffff-ffff-ffff-000000000001';
+const TEST_SITE_KEY = '1x00000000000000000000AA';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -17,18 +17,18 @@ export default function ContactPage() {
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const captchaRef = useRef<HCaptcha>(null);
+  const captchaRef = useRef<any>(null);
   const [siteKey, setSiteKey] = useState(TEST_SITE_KEY);
 
   useEffect(() => {
     // Log environment variables in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('NEXT_PUBLIC_HCAPTCHA_SITE_KEY:', process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY);
+      console.log('NEXT_PUBLIC_TURNSTILE_SITE_KEY:', process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
     }
     
     // Set site key from environment variable if available
-    if (process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY) {
-      setSiteKey(process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY);
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+      setSiteKey(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
     }
   }, []);
 
@@ -38,44 +38,23 @@ export default function ContactPage() {
     setErrorMessage('');
 
     try {
-      let token;
-      try {
-        // For visible captcha, get the response directly
-        token = captchaRef.current?.getResponse();
-        
-        if (!token) {
-          // If no token, try to execute (for invisible mode compatibility)
-          token = await captchaRef.current?.execute();
-        }
-        
-        if (!token) {
-          throw new Error('Please complete the captcha verification');
-        }
-        
-        console.log('Using captcha token:', token);
-      } catch (captchaError) {
-        console.error('hCaptcha error:', captchaError);
-        setStatus('error');
-        setErrorMessage('Failed to verify captcha. Please try again.');
-        return;
+      let token = captchaRef.current?.getResponse?.();
+      if (!token) {
+        token = captchaRef.current?.getValue?.();
       }
-      
-      const formPayload = { ...formData, hcaptchaToken: token };
-      console.log('Sending form data:', formPayload);
-      
+      if (!token) {
+        throw new Error('Please complete the captcha verification');
+      }
+      const formPayload = { ...formData, turnstileToken: token };
       const response = await fetch('/api/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formPayload),
       });
-
       const data = await response.json();
-      console.log('API response:', JSON.stringify(data, null, 2));
-
       if (!response.ok) {
         let errorMessage = data.error || 'Failed to send message';
         if (data.details) {
-          console.error('Full error details:', JSON.stringify(data.details, null, 2));
           if (Array.isArray(data.details)) {
             errorMessage = data.details
               .map((err: any) => `${err.path.join('.')}: ${err.message}`)
@@ -88,10 +67,9 @@ export default function ContactPage() {
         }
         throw new Error(errorMessage);
       }
-
       setStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
-      captchaRef.current?.resetCaptcha();
+      captchaRef.current?.reset?.();
     } catch (error) {
       console.error('Form submission error:', error);
       setStatus('error');
@@ -190,28 +168,19 @@ export default function ContactPage() {
                 />
               </div>
 
-              {/* HCaptcha */}
+              {/* Turnstile Captcha */}
               <div className="flex justify-center">
                 <div className="h-[100px] min-w-[300px] flex items-center justify-center bg-gray-50 rounded-lg p-4">
-                  <HCaptcha
-                    ref={captchaRef}
-                    sitekey={siteKey}
-                    size="normal"
-                    onError={(err) => {
-                      console.error('hCaptcha error:', err);
-                      setStatus('error');
-                      setErrorMessage('Failed to load captcha. Please check your internet connection.');
-                    }}
-                    onLoad={() => {
-                      console.log('hCaptcha loaded successfully with site key:', siteKey);
-                    }}
-                    onVerify={(token) => {
-                      console.log('hCaptcha verified with token:', token);
-                    }}
-                    onExpire={() => {
-                      console.log('hCaptcha expired');
-                    }}
-                  />
+                  {siteKey && (
+                    <Turnstile
+                      siteKey={siteKey}
+                      onSuccess={(token: string) => {
+                        if (captchaRef.current) captchaRef.current.token = token;
+                      }}
+                      ref={captchaRef}
+                      options={{ theme: 'light' }}
+                    />
+                  )}
                 </div>
               </div>
 
