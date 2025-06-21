@@ -118,19 +118,26 @@ export const generateMetadata = (
   noIndex?: boolean,
   path?: string
 ): Metadata => {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mtdavis.info';
+  const canonicalUrl = path ? new URL(path, baseUrl).toString() : baseUrl;
+
   const metadata: Metadata = {
     ...defaultMetadata,
-    title: title || defaultMetadata.title,
-    description: description || defaultMetadata.description,
+    title: title || defaultMetadata.title || siteTitle,
+    description: description || defaultMetadata.description || siteDescription,
+    alternates: {
+      canonical: canonicalUrl
+    },
+    openGraph: {
+      ...defaultMetadata.openGraph,
+      url: canonicalUrl,
+      title: title || siteTitle,
+      description: description || siteDescription,
+      siteName: siteTitle,
+      locale: 'en_US',
+      type: 'website'
+    }
   };
-
-  // Update canonical URL based on current path
-  if (path) {
-    metadata.alternates = {
-      ...metadata.alternates,
-      canonical: new URL(path, siteUrl).toString()
-    };
-  }
 
   if (image) {
     metadata.openGraph = {

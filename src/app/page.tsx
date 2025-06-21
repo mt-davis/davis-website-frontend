@@ -13,6 +13,15 @@ export const metadata: Metadata = {
   ...defaultMetadata,
   title: "Home | Marquese T Davis",
   description: "Welcome to my personal website focused on IT Leadership and Innovation.",
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://mtdavis.info'
+  },
+  openGraph: {
+    ...defaultMetadata.openGraph,
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://mtdavis.info',
+    title: "Home | Marquese T Davis",
+    description: "Welcome to my personal website focused on IT Leadership and Innovation."
+  }
 };
 
 export default function LandingPage() {

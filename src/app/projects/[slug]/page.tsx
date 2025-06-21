@@ -196,15 +196,21 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
     const projectData = project.data[0];
     const seoBlock = projectData.block?.find((b: any) => b.__component === 'shared.seo');
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mtdavis.info';
+    const canonicalUrl = new URL(`/projects/${params.slug}`, baseUrl).toString();
 
     return {
       ...defaultMetadata,
-      title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
-      description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description,
+      title: seoBlock?.metaTitle || projectData.title,
+      description: seoBlock?.metaDescription || projectData.description,
+      alternates: {
+        canonical: canonicalUrl
+      },
       openGraph: {
         ...defaultMetadata.openGraph,
-        title: seoBlock?.metaTitle || projectData.title || defaultMetadata.title,
-        description: seoBlock?.metaDescription || projectData.description || defaultMetadata.description,
+        url: canonicalUrl,
+        title: seoBlock?.metaTitle || projectData.title,
+        description: seoBlock?.metaDescription || projectData.description,
         images: projectData.cover?.data?.attributes?.url ? [
           {
             url: projectData.cover.data.attributes.url,
@@ -212,7 +218,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
             height: 630,
             alt: projectData.title
           }
-        ] : defaultMetadata.openGraph?.images || []
+        ] : defaultMetadata.openGraph?.images
       }
     };
   } catch (error) {

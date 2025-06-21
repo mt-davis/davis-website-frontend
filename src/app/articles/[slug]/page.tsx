@@ -11,6 +11,9 @@ import Link from 'next/link';
 import ShareButtons from '@/components/ShareButtons';
 import { fetchAPI } from '@/lib/api';
 import Script from 'next/script';
+import { Metadata } from 'next';
+import { defaultMetadata } from '@/lib/seo';
+import UnderConstructionPage from '@/components/UnderConstructionPage';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
@@ -45,76 +48,59 @@ async function getArticle(slug: string) {
           $eq: slug
         }
       },
-      populate: '*'
+      populate: ['cover', 'categories', 'block', 'author']
     });
-    return article.data?.[0];
+
+    if (!article.data?.[0]) {
+      return null;
+    }
+
+    return article.data[0];
   } catch (error) {
     console.error('Error fetching article:', error);
     return null;
   }
 }
 
-function UnderConstructionPage({ title }: { title: string }) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 flex flex-col items-center justify-center p-4">
-      <div className="max-w-2xl w-full text-center space-y-8">
-        {/* Fun Construction Animation */}
-        <div className="relative h-40 w-40 mx-auto mb-8">
-          <div className="absolute inset-0 animate-bounce">
-            {"🚧"}
-          </div>
-          <div className="absolute inset-0 animate-ping opacity-75 delay-300">
-            {"⚡"}
-          </div>
-          <div className="absolute inset-0 animate-pulse delay-500">
-            {"✨"}
-          </div>
-        </div>
+// Generate metadata for the page
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  try {
+    const article = await getArticle(params.slug);
 
-        {/* Message */}
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-          Coming Soon!
-        </h1>
-        <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 mb-6">
-          "{title}"
-        </h2>
-        <p className="text-xl text-gray-600 mb-8">
-          Our writers are crafting something amazing. 
-          This article is still under construction! 🏗️
-        </p>
+    if (!article) {
+      return defaultMetadata;
+    }
 
-        {/* Fun Facts Section */}
-        <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-lg">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            While you wait, did you know? 🤔
-          </h3>
-          <p className="text-gray-600 mb-4">
-            The average person spends 6 months of their lifetime waiting for red lights to turn green.
-            This article won't take that long, we promise! 😉
-          </p>
-        </div>
+    const seoBlock = article.block?.find((b: any) => b.__component === 'shared.seo');
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mtdavis.info';
+    const canonicalUrl = new URL(`/articles/${params.slug}`, baseUrl).toString();
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-          <Link 
-            href="/articles" 
-            className="px-6 py-3 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors shadow-lg group"
-          >
-            Browse Other Articles
-            <span className="ml-2 group-hover:translate-x-1 transition-transform inline-block">
-              →
-            </span>
-          </Link>
-          <button 
-            onClick={() => window.history.back()} 
-            className="px-6 py-3 bg-white/80 text-gray-700 rounded-full hover:bg-white transition-colors shadow-lg"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    return {
+      ...defaultMetadata,
+      title: seoBlock?.metaTitle || article.title,
+      description: seoBlock?.metaDescription || article.description,
+      alternates: {
+        canonical: canonicalUrl
+      },
+      openGraph: {
+        ...defaultMetadata.openGraph,
+        url: canonicalUrl,
+        title: seoBlock?.metaTitle || article.title,
+        description: seoBlock?.metaDescription || article.description,
+        images: article.cover?.url ? [
+          {
+            url: article.cover.url,
+            width: 1200,
+            height: 630,
+            alt: article.title
+          }
+        ] : defaultMetadata.openGraph?.images
+      }
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
+    return defaultMetadata;
+  }
 }
 
 export default async function ArticleDetail({

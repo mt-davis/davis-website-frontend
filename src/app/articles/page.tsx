@@ -3,6 +3,8 @@ import Link from 'next/link';
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import { fetchAPI } from '@/lib/api';
+import { Metadata } from 'next';
+import { defaultMetadata } from '@/lib/seo';
 
 async function getArticles() {
   try {
@@ -178,4 +180,24 @@ export default async function ArticlesPage() {
       <Footer />
     </>
   );
-} 
+}
+
+export const metadata: Metadata = {
+  ...defaultMetadata,
+  title: "Articles | Marquese T Davis",
+  description: "Read my latest articles on IT Leadership, Digital Transformation, and Technology Innovation.",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/articles` || 'https://mtdavis.info/articles'
+  },
+  openGraph: {
+    ...defaultMetadata.openGraph,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL}/articles` || 'https://mtdavis.info/articles',
+    title: "Articles | Marquese T Davis",
+    description: "Read my latest articles on IT Leadership, Digital Transformation, and Technology Innovation.",
+  },
+  twitter: {
+    ...defaultMetadata.twitter,
+    title: "Articles | Marquese T Davis",
+    description: "Read my latest articles on IT Leadership, Digital Transformation, and Technology Innovation.",
+  }
+}; 

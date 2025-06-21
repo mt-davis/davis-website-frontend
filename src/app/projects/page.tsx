@@ -10,8 +10,12 @@ export const metadata: Metadata = {
   ...defaultMetadata,
   title: "Projects & Work | Marquese T Davis",
   description: "Explore my portfolio of projects in IT Leadership, Digital Transformation, and Technology Innovation.",
+  alternates: {
+    canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/projects` || 'https://mtdavis.info/projects'
+  },
   openGraph: {
     ...defaultMetadata.openGraph,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL}/projects` || 'https://mtdavis.info/projects',
     title: "Projects & Work | Marquese T Davis",
     description: "Explore my portfolio of projects in IT Leadership, Digital Transformation, and Technology Innovation.",
   },
