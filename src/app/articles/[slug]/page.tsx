@@ -10,6 +10,7 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 import ShareButtons from '@/components/ShareButtons';
 import { fetchAPI } from '@/lib/api';
+import Script from 'next/script';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
@@ -144,9 +145,43 @@ export default async function ArticleDetail({
   }
 
   const coverUrl = cover?.formats?.medium?.url || cover?.formats?.small?.url || cover?.url;
+  const fullCoverUrl = coverUrl ? `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${coverUrl}` : undefined;
+
+  // Prepare JSON-LD structured data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: title,
+    description: description,
+    image: fullCoverUrl,
+    datePublished: publishedAt,
+    dateModified: article.updatedAt || publishedAt,
+    author: {
+      '@type': 'Person',
+      name: author?.name || 'Marquese T Davis',
+      url: 'https://mtdavis.info'
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Marquese T Davis',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/images/logo.png`
+      }
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${process.env.NEXT_PUBLIC_SITE_URL}/articles/${slug}`
+    }
+  };
 
   return (
     <>
+      <Script
+        id="article-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ArticleHeader />
       <article className="min-h-screen bg-white pt-20">
         {/* Hero Section with Cover Image */}

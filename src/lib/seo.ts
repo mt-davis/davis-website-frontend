@@ -159,3 +159,56 @@ export const generateMetadata = (
 
   return metadata;
 };
+
+export function generateSEOMetadata({
+  title,
+  description,
+  image,
+  type = 'website',
+  publishedTime,
+  modifiedTime,
+  author,
+  section,
+}: {
+  title: string;
+  description: string;
+  image?: string;
+  type?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  section?: string;
+}) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mtdavis.info';
+  const imageUrl = image ? `${process.env.NEXT_PUBLIC_STRAPI_API_URL}${image}` : `${baseUrl}/images/profile-pic.png`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type,
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+      publishedTime,
+      modifiedTime,
+      authors: author ? [author] : ['Marquese T Davis'],
+      siteName: 'Marquese T Davis',
+    },
+    // LinkedIn specific metadata
+    other: {
+      'linkedin:author': author || 'Marquese T Davis',
+      'linkedin:company': 'Marquese T Davis Consulting',
+      'article:published_time': publishedTime,
+      'article:modified_time': modifiedTime,
+      'article:section': section,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+      creator: '@mtdavis',
+    },
+  };
+}
