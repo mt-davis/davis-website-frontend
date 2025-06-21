@@ -106,7 +106,7 @@ export default function ExecutiveCoachRFPForm() {
       
       const response = await fetch('/api/send', {
         method: 'POST',
-        body: formDataToSend, // Send as FormData instead of JSON
+        body: formDataToSend // FormData will automatically set the correct content-type
       });
 
       const data = await response.json();

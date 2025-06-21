@@ -47,18 +47,32 @@ function isContactForm(data: FormData): data is ContactFormData {
 
 export async function POST(request: Request) {
   try {
-    // Parse FormData instead of JSON
-    const formData = await request.formData();
-    const files = formData.getAll('attachments') as File[];
-    
-    // Convert FormData to object for validation
-    const body: Record<string, any> = {};
-    formData.forEach((value, key) => {
-      if (key !== 'attachments') {
-        body[key] = value;
-      }
-    });
-    
+    let body: Record<string, any>;
+    let files: File[] = [];
+
+    // Check content type and parse accordingly
+    const contentType = request.headers.get('content-type');
+    if (contentType?.includes('multipart/form-data')) {
+      const formData = await request.formData();
+      files = formData.getAll('attachments') as File[];
+      body = {};
+      formData.forEach((value, key) => {
+        if (key !== 'attachments') {
+          body[key] = value;
+        }
+      });
+    } else if (contentType?.includes('application/json')) {
+      body = await request.json();
+    } else {
+      return NextResponse.json(
+        { 
+          error: 'Invalid content type',
+          details: 'Content-Type must be either multipart/form-data or application/json'
+        },
+        { status: 400 }
+      );
+    }
+
     console.log('Received request body:', body);
 
     // Validate request body
@@ -155,9 +169,9 @@ ${validatedData.message}`;
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('API error:', error);
+    console.error('Unexpected error:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error', details: error },
       { status: 500 }
     );
   }

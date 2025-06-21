@@ -49,8 +49,10 @@ export default function ContactBubble() {
       
       const response = await fetch('/api/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formPayload),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formPayload)
       });
 
       const data = await response.json();
