@@ -305,6 +305,13 @@ export default async function ProjectDetail({ params }: PageProps) {
               >
                 {richTextBlock.body}
               </ReactMarkdown>
+
+              {/* Add ShareButtons component */}
+              <ShareButtons 
+                url={`${process.env.NEXT_PUBLIC_SITE_URL}/projects/${params.slug}`}
+                title={projectData.title}
+                description={projectData.description}
+              />
             </div>
           )}
         </div>

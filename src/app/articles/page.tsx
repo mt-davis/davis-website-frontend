@@ -2,29 +2,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
+import { fetchAPI } from '@/lib/api';
 
 async function getArticles() {
-  const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
-  
-  // If no API URL is configured, return empty array
-  if (!apiUrl) {
-    console.warn('NEXT_PUBLIC_STRAPI_API_URL is not configured');
-    return [];
-  }
-
   try {
-    const res = await fetch(
-      `${apiUrl}/api/articles?populate=*`,
-      { next: { revalidate: 60 } }
-    );
-    
-    if (!res.ok) {
-      console.error('Failed to fetch articles:', res.status);
-      return [];
-    }
-
-    const data = await res.json();
-    return data.data || [];
+    const articles = await fetchAPI('articles', {
+      populate: '*'
+    });
+    return articles.data || [];
   } catch (error) {
     console.error('Error fetching articles:', error);
     return [];

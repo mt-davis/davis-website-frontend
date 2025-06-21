@@ -59,11 +59,22 @@ export const defaultMetadata: Metadata = {
     },
   },
   verification: {
-    google: 'your-google-verification-code',
-    // Add other verification codes as needed
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    } : {}),
+    ...(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || process.env.NEXT_PUBLIC_BING_VERIFICATION ? {
+      other: {
+        ...(process.env.NEXT_PUBLIC_YANDEX_VERIFICATION ? {
+          'yandex-verification': [process.env.NEXT_PUBLIC_YANDEX_VERIFICATION]
+        } : {}),
+        ...(process.env.NEXT_PUBLIC_BING_VERIFICATION ? {
+          'msvalidate.01': [process.env.NEXT_PUBLIC_BING_VERIFICATION]
+        } : {})
+      }
+    } : {})
   },
   alternates: {
-    canonical: siteUrl,
+    canonical: new URL('/', siteUrl).toString(),
     types: {
       'application/rss+xml': `${siteUrl}/feed.xml`,
     },
@@ -104,13 +115,22 @@ export const generateMetadata = (
   title?: string,
   description?: string,
   image?: string,
-  noIndex?: boolean
+  noIndex?: boolean,
+  path?: string
 ): Metadata => {
   const metadata: Metadata = {
     ...defaultMetadata,
     title: title || defaultMetadata.title,
     description: description || defaultMetadata.description,
   };
+
+  // Update canonical URL based on current path
+  if (path) {
+    metadata.alternates = {
+      ...metadata.alternates,
+      canonical: new URL(path, siteUrl).toString()
+    };
+  }
 
   if (image) {
     metadata.openGraph = {

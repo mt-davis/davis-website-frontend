@@ -8,6 +8,8 @@ import { notFound } from "next/navigation";
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+import ShareButtons from '@/components/ShareButtons';
+import { fetchAPI } from '@/lib/api';
 
 // Custom markdown components for consistent spacing, padding & headings
 const mdComponents = {
@@ -35,27 +37,16 @@ const mdComponents = {
 };
 
 async function getArticle(slug: string) {
-  const apiUrl = process.env.NEXT_PUBLIC_STRAPI_API_URL;
-  
-  // If no API URL is configured, return null
-  if (!apiUrl) {
-    console.warn('NEXT_PUBLIC_STRAPI_API_URL is not configured');
-    return null;
-  }
-
   try {
-    const res = await fetch(
-      `${apiUrl}/api/articles?filters[slug][$eq]=${slug}&populate=*`,
-      { next: { revalidate: 60 } }
-    );
-
-    if (!res.ok) {
-      console.error('Failed to fetch article:', await res.text());
-      return null;
-    }
-
-    const data = await res.json();
-    return data.data?.[0];
+    const article = await fetchAPI('articles', {
+      filters: {
+        slug: {
+          $eq: slug
+        }
+      },
+      populate: '*'
+    });
+    return article.data?.[0];
   } catch (error) {
     console.error('Error fetching article:', error);
     return null;
@@ -229,31 +220,20 @@ export default async function ArticleDetail({
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm, remarkFlexibleMarkers]}
                   rehypePlugins={[rehypeRaw]}
-                  components={{
-                    ...mdComponents,
-                    // Override specific components for better markdown support
-                    code: ({ node, inline, className, children, ...props }: any) => {
-                      const match = /language-(\w+)/.exec(className || '');
-                      const language = match ? match[1] : '';
-                      
-                      return inline ? (
-                        <code className="bg-pink-50 text-pink-500 px-1 py-0.5 rounded text-sm font-mono" {...props}>
-                          {children}
-                        </code>
-                      ) : (
-                        <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 overflow-x-auto">
-                          <code className={`language-${language}`} {...props}>
-                            {children}
-                          </code>
-                        </pre>
-                      );
-                    }
-                  }}
+                  components={mdComponents}
                 >
                   {description}
                 </ReactMarkdown>
               </div>
             )}
+            
+            {/* Add ShareButtons component */}
+            <ShareButtons 
+              url={`${process.env.NEXT_PUBLIC_SITE_URL}/articles/${slug}`}
+              title={title}
+              description={description}
+            />
+
             {blocks?.map((block: any, idx: number) => {
               switch (block.__component) {
                 case "shared.rich-text":

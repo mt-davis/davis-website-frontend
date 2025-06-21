@@ -25,22 +25,24 @@ export default function Header() {
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-white/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
       }`}>
-        <nav className="relative z-20 p-4 md:p-6">
+        <nav className="relative z-20 p-4 md:p-6" aria-label="Main navigation">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             {/* Left: Hamburger Menu */}
-            <div className="w-8 md:w-10">
+            <div className="w-8 md:w-10" role="navigation" aria-label="Mobile menu">
               <HamburgerMenu variant={isScrolled ? 'dark' : 'light'} />
             </div>
 
             {/* Center: DAVIS */}
             <div className="absolute left-1/2 -translate-x-1/2">
-              <div className={`text-xl md:text-2xl font-bold transition-colors duration-300 ${
-                isScrolled ? 'text-gray-900' : 'text-white'
-              }`}>DAVIS</div>
+              <Link href="/" aria-label="Home">
+                <div className={`text-xl md:text-2xl font-bold transition-colors duration-300 ${
+                  isScrolled ? 'text-gray-900' : 'text-white'
+                }`}>DAVIS</div>
+              </Link>
             </div>
 
             {/* Right: Social Icons */}
-            <div className="flex items-center space-x-4 md:space-x-6">
+            <nav className="flex items-center space-x-4 md:space-x-6" aria-label="Social media links">
               <Link 
                 href="https://www.linkedin.com/in/marquesedavis/" 
                 target="_blank"
@@ -67,7 +69,7 @@ export default function Header() {
                   <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>
                 </svg>
               </Link>
-            </div>
+            </nav>
           </div>
         </nav>
       </header>
@@ -80,7 +82,7 @@ export default function Header() {
           <div className="block md:hidden h-full">
             <Image
               src="/images/mobile-hero.png"
-              alt="New Haven, CT Ai Mobile"
+              alt="Technology Leadership and Innovation in New Haven - Mobile View"
               fill
               className="object-cover"
               priority
@@ -94,7 +96,7 @@ export default function Header() {
           <div className="hidden md:block h-full">
             <Image
               src="/images/hero-image.png"
-              alt="New Haven, CT Ai"
+              alt="Technology Leadership and Digital Innovation Hub in New Haven"
               fill
               className="object-cover"
               priority
@@ -107,9 +109,11 @@ export default function Header() {
 
         {/* Hero Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4 -mt-32">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2 leading-tight">WHERE TECHNOLOGY IS...</h1>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight">
-            <TypedText />
+            WHERE TECHNOLOGY IS...{' '}
+            <span className="block mt-2">
+              <TypedText />
+            </span>
           </h1>
         </div>
       </section>
