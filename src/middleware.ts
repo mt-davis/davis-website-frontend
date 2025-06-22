@@ -72,7 +72,7 @@ export function middleware(request: NextRequest) {
   if (!request.nextUrl.pathname.startsWith('/api')) {
     const cspHeader = `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.cloudflare.com https://*.turnstile.com https://challenges.cloudflare.com *.vercel-insights.com *.vercel-analytics.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.cloudflare.com https://*.turnstile.com https://challenges.cloudflare.com *.vercel-insights.com *.vercel-analytics.com *.vercel-scripts.com https://va.vercel-scripts.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       img-src 'self' blob: data: https://*.cloudflare.com *.strapiapp.com https://*.googleusercontent.com;
       font-src 'self' data: https://fonts.gstatic.com;
@@ -81,7 +81,7 @@ export function middleware(request: NextRequest) {
       form-action 'self';
       frame-ancestors 'none';
       frame-src 'self' https://*.cloudflare.com https://*.turnstile.com https://challenges.cloudflare.com;
-      connect-src 'self' https://*.cloudflare.com https://*.turnstile.com https://challenges.cloudflare.com *.vercel-insights.com *.vercel-analytics.com optimistic-actor-4a3a244025.strapiapp.com;
+      connect-src 'self' https://*.cloudflare.com https://*.turnstile.com https://challenges.cloudflare.com *.vercel-insights.com *.vercel-analytics.com *.vercel-scripts.com https://va.vercel-scripts.com vitals.vercel-insights.com optimistic-actor-4a3a244025.strapiapp.com;
       worker-src 'self' blob: https://*.cloudflare.com https://*.turnstile.com;
       child-src 'self' https://*.cloudflare.com https://*.turnstile.com;
       upgrade-insecure-requests;
@@ -97,7 +97,7 @@ export function middleware(request: NextRequest) {
    */
   response.headers.set(
     'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), interest-cohort()'
+    'accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), clipboard-read=(), clipboard-write=(), gamepad=(), speaker-selection=(), conversion-measurement=(), focus-without-user-activation=(), hid=(), idle-detection=(), interest-cohort=(), serial=(), sync-script=(), trust-token-redemption=(), window-placement=(), vertical-scroll=()'
   );
 
   return response;
