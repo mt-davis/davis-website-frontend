@@ -309,11 +309,23 @@ export default function ExecutiveCoachRFPForm() {
                     <Turnstile
                       siteKey={siteKey}
                       onSuccess={(token: string) => {
-                        // Optionally store token in ref if needed
                         if (captchaRef.current) captchaRef.current.token = token;
                       }}
+                      onError={(error: any) => {
+                        console.error('Turnstile error:', error);
+                        setErrorMessage('Error loading CAPTCHA. Please refresh the page and try again.');
+                      }}
+                      onExpire={() => {
+                        console.log('Turnstile token expired');
+                        if (captchaRef.current) captchaRef.current.token = null;
+                      }}
                       ref={captchaRef}
-                      options={{ theme: 'light' }}
+                      options={{
+                        theme: 'light',
+                        appearance: 'always',
+                        retry: 'auto',
+                        refreshExpired: 'auto'
+                      }}
                     />
                   )}
                 </div>
