@@ -5,6 +5,35 @@ import { z } from 'zod';
 // Resend is initialized lazily inside the handler to avoid build-time failures
 // when RESEND_API_KEY is not present in the build environment.
 
+// Very simple in-memory rate limiter per-IP to protect the contact endpoint.
+// Note: For serverless/edge, prefer a durable store (e.g., Upstash Ratelimit).
+const requestLog = new Map<string, number[]>();
+const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
+const RATE_LIMIT_MAX = 5;            // 5 requests per window
+
+function getClientIp(req: Request): string {
+  const xff = req.headers.get('x-forwarded-for');
+  if (xff) {
+    const first = xff.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  const realIp = req.headers.get('x-real-ip');
+  if (realIp) return realIp;
+  return 'unknown';
+}
+
+function isRateLimited(ip: string, now = Date.now()): boolean {
+  const entries = requestLog.get(ip) || [];
+  const recent = entries.filter(ts => now - ts < RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT_MAX) {
+    requestLog.set(ip, recent);
+    return true;
+  }
+  recent.push(now);
+  requestLog.set(ip, recent);
+  return false;
+}
+
 // Email validation schema
 const emailSchema = z.object({
   name: z.string().min(2).max(50),
@@ -16,6 +45,14 @@ const emailSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const ip = getClientIp(request);
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     console.log('Received request body:', body);
 

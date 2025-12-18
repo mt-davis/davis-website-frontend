@@ -2,7 +2,7 @@
 import Image from "next/image";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import { notFound } from "next/navigation";
 import ArticleHeader from '@/components/ArticleHeader';
 import Footer from '@/components/Footer';
@@ -225,7 +225,7 @@ export default async function ArticleDetail({
           <div className="prose prose-lg max-w-none">
             {description && (
               <div className="mb-8">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdComponents}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]} components={mdComponents}>
                   {description}
                 </ReactMarkdown>
               </div>
@@ -235,7 +235,7 @@ export default async function ArticleDetail({
                 case "shared.rich-text":
                   return (
                     <div key={`${block.__component}-${block.id}-${idx}`} className="mb-8">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdComponents}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]} components={mdComponents}>
                         {block.body}
                       </ReactMarkdown>
                     </div>
