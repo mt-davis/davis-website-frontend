@@ -2,8 +2,8 @@ import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// Initialize Resend with API key
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend is initialized lazily inside the handler to avoid build-time failures
+// when RESEND_API_KEY is not present in the build environment.
 
 // Email validation schema
 const emailSchema = z.object({
@@ -18,6 +18,16 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log('Received request body:', body);
+
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('Missing RESEND_API_KEY environment variable');
+      return NextResponse.json(
+        { error: 'Email service not configured' },
+        { status: 500 }
+      );
+    }
+    const resend = new Resend(apiKey);
 
     // Validate request body
     const result = emailSchema.safeParse(body);
