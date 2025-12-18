@@ -9,6 +9,9 @@ export const defaultMetadata: Metadata = {
   keywords: ["IT Leadership", "Digital Transformation", "Technology Strategy", "Innovation", "Enterprise Technology"],
   authors: [{ name: "Marquese T Davis" }],
   creator: "Marquese T Davis",
+  other: {
+    'impact-site-verification': '1302830105',
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
