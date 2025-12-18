@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version as string | undefined,
+    NEXT_PUBLIC_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA as string | undefined,
+    NEXT_PUBLIC_APP_ENV: (process.env.APP_ENV || process.env.NODE_ENV) as string | undefined,
+  },
 };
 
 export default nextConfig;

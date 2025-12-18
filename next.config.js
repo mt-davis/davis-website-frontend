@@ -14,6 +14,11 @@ const nextConfig = {
       }
     ],
   },
+  env: {
+    NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version,
+    NEXT_PUBLIC_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA,
+    NEXT_PUBLIC_APP_ENV: process.env.APP_ENV || process.env.NODE_ENV,
+  },
 }
 
 module.exports = nextConfig

@@ -3,9 +3,13 @@
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLinkedin, faMediumM } from '@fortawesome/free-brands-svg-icons';
+import pkg from '../../package.json';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const version = process.env.NEXT_PUBLIC_APP_VERSION ?? pkg.version;
+  const commit = process.env.NEXT_PUBLIC_COMMIT_SHA?.slice(0, 7);
+  const env = process.env.NEXT_PUBLIC_APP_ENV ?? (process.env.NODE_ENV === 'production' ? 'prod' : 'dev');
   
   return (
     <footer className="bg-black text-white py-10 px-6">
@@ -47,6 +51,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-sm">
           Made with ❤️and🍕in Connecticut
+          <span className="ml-2 text-gray-400">v{version}{commit ? ` (${commit})` : ''} [{env}]</span>
         </div>
       </div>
     </footer>
