@@ -28,31 +28,35 @@ export default function Header() {
         isScrolled ? 'bg-white/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
       }`}>
         <nav className="relative z-20 p-4 md:p-6">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="max-w-7xl mx-auto grid grid-cols-[1fr_auto_1fr] items-center gap-4">
             {/* Left: Hamburger Menu */}
-            <div className="w-8 md:w-10">
-              <HamburgerMenu variant={isScrolled ? 'dark' : 'light'} />
+            <div className="flex justify-start">
+              <div className="w-8 md:w-10 shrink-0">
+                <HamburgerMenu variant={isScrolled ? 'dark' : 'light'} />
+              </div>
             </div>
 
             {/* Center: DAVIS */}
-            <div className="absolute left-1/2 -translate-x-1/2">
+            <div className="flex justify-center">
               <div className={`text-xl md:text-2xl font-bold transition-colors duration-300 ${
                 isScrolled ? 'text-gray-900' : 'text-white'
-              }`}>DAVIS</div>
+              }`}>
+                DAVIS
+              </div>
             </div>
 
             {/* Right: Social Icons */}
-            <div className="flex items-center space-x-4 md:space-x-6">
+            <div className="flex items-center justify-end gap-3 md:gap-4">
               <Link 
                 href="https://www.linkedin.com/in/marquesedavis/" 
                 target="_blank"
                 rel="noopener noreferrer" 
-                className={`transition-colors duration-300 ${
+                className={`transition-colors duration-300 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                   isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'
                 }`}
               >
                 <span className="sr-only">LinkedIn</span>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                 </svg>
               </Link>
@@ -60,12 +64,12 @@ export default function Header() {
                 href="https://medium.mtdavis.info/" 
                 target="_blank"
                 rel="noopener noreferrer" 
-                className={`transition-colors duration-300 ${
+                className={`transition-colors duration-300 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                   isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'
                 }`}
               >
                 <span className="sr-only">Medium</span>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M13.54 12a6.8 6.8 0 01-6.77 6.82A6.8 6.8 0 010 12a6.8 6.8 0 016.77-6.82A6.8 6.8 0 0113.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42M24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/>
                 </svg>
               </Link>
@@ -73,12 +77,12 @@ export default function Header() {
                 href="https://www.instagram.com/marquesetdavis/" 
                 target="_blank"
                 rel="noopener noreferrer" 
-                className={`transition-colors duration-300 ${
+                className={`transition-colors duration-300 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                   isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'
                 }`}
               >
                 <span className="sr-only">Instagram</span>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3h10zM12 7a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm5.5-2a1.5 1.5 0 100 3 1.5 1.5 0 000-3z"/>
                 </svg>
               </Link>
@@ -86,12 +90,12 @@ export default function Header() {
                 href="https://www.youtube.com/@iammtdavis" 
                 target="_blank"
                 rel="noopener noreferrer" 
-                className={`transition-colors duration-300 ${
+                className={`transition-colors duration-300 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 ${
                   isScrolled ? 'text-gray-700 hover:text-gray-900' : 'text-white hover:text-gray-200'
                 }`}
               >
                 <span className="sr-only">YouTube</span>
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.7 3.5 12 3.5 12 3.5s-7.7 0-9.4.6A3 3 0 00.5 6.2 31.3 31.3 0 000 12a31.3 31.3 0 00.5 5.8 3 3 0 002.1 2.1c1.7.6 9.4.6 9.4.6s7.7 0 9.4-.6a3 3 0 002.1-2.1A31.3 31.3 0 0024 12a31.3 31.3 0 00-.5-5.8zM9.75 15.02v-6.04L15.5 12l-5.75 3.02z"/>
                 </svg>
               </Link>
