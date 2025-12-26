@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLinkedin, faMediumM } from '@fortawesome/free-brands-svg-icons';
+import { faLinkedin, faMediumM, faInstagram, faYoutube } from '@fortawesome/free-brands-svg-icons';
 import pkg from '../../package.json';
 
 export default function Footer() {
@@ -43,6 +43,22 @@ export default function Footer() {
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <FontAwesomeIcon icon={faMediumM} size="lg" />
+              </a>
+              <a 
+                href="https://www.instagram.com/marquesetdavis/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <FontAwesomeIcon icon={faInstagram} size="lg" />
+              </a>
+              <a 
+                href="https://www.youtube.com/@iammtdavis" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <FontAwesomeIcon icon={faYoutube} size="lg" />
               </a>
             </div>
             <p className="text-gray-400">Get in touch for collaborations and opportunities.</p>
